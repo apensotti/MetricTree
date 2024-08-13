@@ -3,7 +3,7 @@ import Flow from '../../components/Flow'
 
 const page = () => {
   return (
-        <div style={{ height: 1080}}>
+        <div style={{ height: 1280}}>
             <Flow/>
         </div>
   )

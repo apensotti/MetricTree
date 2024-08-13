@@ -1,44 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Background,
   Controls,
+  Edge,
+  EdgeTypes,
   ReactFlow,
-  useNodesState,
   type Node,
   type NodeTypes,
 } from "@xyflow/react";
 
 import '@xyflow/react/dist/base.css';
 
-import '../../tailwind.config.ts'
+import '../../tailwind.config'
 import DataNode from "./DataNode";
+import NodeArrow from "./NodeArrow";
+
+import { generateMetricTreeData, generateMetricTreeConnections } from "../data/TreeTemplate";
 
 const nodeTypes: NodeTypes = {
   data: DataNode,
 };
 
-const initialNodes: Node[] = [
-  { id: '1',
-    type: 'data',
-    data: { title: 'Node 1', valueStart: '100', valueEnd: '200', change: '100', start_month: 'Jan', end_month: 'Feb', year: 2022 }, 
-    position: { x: 5, y: 5 } 
-  },
-  { id: '2', 
-    type: 'data',
-    data: { title: 'Node 1', valueStart: '100', valueEnd: '200', change: '100', start_month: 'Jan', end_month: 'Feb', year: 2022 }, 
-    position: { x: 5, y: 300 } 
-  },
-];
+const edgeTypes: EdgeTypes = {
+  "custom-edge": NodeArrow, 
+}
 
 export default function Flow() {
-    const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
 
-    return (
-    <ReactFlow nodes={nodes} nodeTypes={nodeTypes} fitView className="bg-slate-950">
-      <Background/>
-      <Controls/>
-    </ReactFlow>
+  useEffect(() => {
+    async function fetchData() {
+        const data = await generateMetricTreeData();
+        const edges = await generateMetricTreeConnections();
+        setNodes(data);
+        console.log(data)
+        setEdges(edges);
+        console.log(edges)
+    }
+    fetchData();
+  }, []);
+
+  
+
+  return (
+  <ReactFlow nodes={nodes}
+            nodeTypes={nodeTypes} 
+            edges={edges}
+            fitView 
+            className="bg-slate-950">
+    <Background/>
+    <Controls className="bg-white"/>
+  </ReactFlow>
   );
 }

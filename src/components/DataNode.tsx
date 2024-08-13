@@ -1,7 +1,8 @@
 "use client";
 
 import React, {memo} from 'react'
-import type { Node, NodeProps } from '@xyflow/react';
+import type {Node, NodeProps } from '@xyflow/react';
+import { Handle, Position } from '@xyflow/react';
 
 export type DataNode = Node<{
   title: string,
@@ -13,25 +14,19 @@ export type DataNode = Node<{
   year: number
  }, 'data'>;
 
-export interface CardProps {
-    id: number;
-    title: string;
-    valueStart: string;
-    valueEnd: string;
-    change: string;
-    start_month?: string;
-    end_month: string;
-    year: number;
-    children?: React.ReactNode;
-}
-
 function getChangeClass(value: string) {
     return value && value.startsWith('-') ? 'text-red-800' : 'text-green-800';
 }
 
-const DataNode = ({data}: NodeProps<DataNode>) => {
+const DataNode = ({id, data}: NodeProps<DataNode>) => {
   return (
-    <div className="flex flex-col items-center bg-slate-950 text-white">
+    <>
+    <Handle
+        type="target"
+        position={Position.Top}
+        style={{ background: '#555' }}>
+    </Handle>
+    <div id={id} className="flex flex-col items-center bg-slate-950 text-white">
         <div className="w-96 border border-white rounded-md">
           <p className="text-xl font-semibold p-4">{data.title}</p>
           <div className='border-t border-b border-white flex felx-col gap-6 justify-center'>
@@ -53,6 +48,12 @@ const DataNode = ({data}: NodeProps<DataNode>) => {
           </div>
         </div>
     </div>
+    <Handle
+        type="source"
+        position={Position.Bottom}
+        style={{ background: '#555' }}>
+    </Handle>
+    </>
   )
 }
 
