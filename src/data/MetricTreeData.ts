@@ -88,6 +88,8 @@ export async function getMetricTreeData(path: string): Promise<TreeDataProps> {
             return month === currentMonth-1;
         });
 
+        
+
         const treeData = {
             year: new Date().getFullYear(),
             current_month: getAbbreviatedMonth(new Date()),

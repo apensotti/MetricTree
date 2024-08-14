@@ -64,7 +64,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_first_revenue, true),
             change: formatNumber(data.current_first_revenue - data.previous_first_revenue, true)
         },
-        position: {x: -600, y: 450}
+        position: {x: -450, y: 450}
     },
     {
         id: '3a',
@@ -78,7 +78,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_first_appointment, false),
             change: formatNumber(data.current_first_appointment - data.previous_first_appointment, false)
         },
-        position: {x: -900, y: 900}
+        position: {x: -700, y: 900}
     },
     {
         id: '3b',
@@ -92,7 +92,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber((data.current_first_revenue/data.current_first_appointment), true),
             change: formatNumber((data.current_first_revenue/data.current_first_appointment) - (data.previous_first_revenue/data.previous_first_appointment), true),
         },
-        position: {x: -300, y: 900}
+        position: {x: -200, y: 900},
     },
     {
         id: '2b',
@@ -106,7 +106,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_repeat_revenue, true),
             change: formatNumber(data.current_repeat_revenue - data.previous_repeat_revenue, true)
         },
-        position: {x: 600, y: 450}
+        position: {x: 450, y: 450}
     },
     {
         id: '3c',
@@ -120,7 +120,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_repeat_appointment, false),
             change: formatNumber(data.current_repeat_appointment - data.previous_repeat_appointment, false)
         },
-        position: {x: 300, y: 900}
+        position: {x: 200, y: 900}
     },
     {
         id: '3d',
@@ -134,7 +134,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber((data.current_repeat_revenue/data.current_repeat_appointment), true),
             change: formatNumber((data.current_repeat_revenue/data.current_repeat_appointment) - (data.previous_repeat_revenue/data.previous_repeat_appointment), true),
         },
-        position: {x: 900, y: 900}
+        position: {x: 700, y: 900}
     },
     ]};
 

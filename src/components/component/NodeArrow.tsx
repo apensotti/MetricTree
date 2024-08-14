@@ -10,7 +10,7 @@ export default function NodeArrow({ id, sourceX, sourceY, targetX, targetY }: Ed
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge id={id} path={edgePath}/>
     </>
   );
 }

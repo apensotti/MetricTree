@@ -15,7 +15,7 @@ export type DataNode = Node<{
  }, 'data'>;
 
 function getChangeClass(value: string) {
-    return value && value.startsWith('-') ? 'text-red-800' : 'text-green-800';
+    return value && value.startsWith('-') ? 'text-red-600' : 'text-green-600';
 }
 
 const DataNode = ({id, data}: NodeProps<DataNode>) => {
@@ -24,18 +24,18 @@ const DataNode = ({id, data}: NodeProps<DataNode>) => {
     <Handle
         type="target"
         position={Position.Top}
-        style={{ background: '#555' }}>
+        style={{ opacity: 0 }}>
     </Handle>
-    <div id={id} className="flex flex-col items-center bg-slate-950 text-white">
+    <div id={id} className="flex flex-col items-center bg-gray-950 text-white shadow-lg">
         <div className="border border-white rounded-md w-80">
           <p className="text-sm font-semibold p-3">{data.title}</p>
           <div className='border-t border-b border-white flex felx-col gap-6 justify-center'>
             <div className="flex flex-col p-2">
-              <p className="text-md font-semibold ">{data.valueStart}</p>
+              <p className="text-sm font-semibold ">{data.valueStart}</p>
               <p className="text-xs pt-2 text-gray-400">{data.start_month + " " + data.year}</p>
             </div>
             <div className="flex flex-col p-2">
-              <p className="text-ms font-semibold ">{data.valueEnd}</p>
+              <p className="text-sm font-semibold ">{data.valueEnd}</p>
               <p className="text-xs pt-2 text-gray-400">{data.end_month + " " + data.year}</p>
             </div>
             <div className="flex flex-col p-2">
@@ -51,7 +51,7 @@ const DataNode = ({id, data}: NodeProps<DataNode>) => {
     <Handle
         type="source"
         position={Position.Bottom}
-        style={{ background: '#555' }}>
+        style={{ opacity: 0 }}>
     </Handle>
     </>
   )
