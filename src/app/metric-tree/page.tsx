@@ -1,9 +1,10 @@
-import React, { use } from 'react'
+import React from 'react'
 import Flow from '../../components/Flow'
 
 const page = () => {
+
   return (
-        <div style={{ height: 1280}}>
+        <div style={{ height: "100vh", width: "100vw"}}>
             <Flow/>
         </div>
   )

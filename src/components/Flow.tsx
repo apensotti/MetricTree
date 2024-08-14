@@ -36,9 +36,7 @@ export default function Flow() {
         const data = await generateMetricTreeData();
         const edges = await generateMetricTreeConnections();
         setNodes(data);
-        console.log(data)
         setEdges(edges);
-        console.log(edges)
     }
     fetchData();
   }, []);
