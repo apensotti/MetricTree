@@ -54,13 +54,13 @@ export function CheckboxDropdown() {
           variant="secondary"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-5/6 justify-between"
         >
-          Select Market
+          Select
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="max-w-64 p-0 bg-primary">
+      <PopoverContent className="max-w-56 p-0 bg-primary">
         <Command>
           <CommandInput placeholder="Search market..." className="h-9 " />
           <CommandList>

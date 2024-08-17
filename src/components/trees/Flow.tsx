@@ -21,10 +21,9 @@ import '../../../tailwind.config'
 import DataNode from "../component/DataNode"
 import NodeArrow from "../component/NodeArrow"
 
-import { generateMetricTreeData, generateMetricTreeConnections } from "../../data/TreeTemplate";
+import { getMetricTreeData, generateMetricTreeConnections } from "../../data/TreeTemplate";
 
-import { Button } from "../ui/button";
-import { CheckboxDropdown } from "../ui/CheckboxDropdown";
+import FilterPanel from "../component/FilterPanel";
 
 const nodeTypes: NodeTypes = {
   data: DataNode,
@@ -37,20 +36,22 @@ const edgeTypes: EdgeTypes = {
 export default function Flow() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     async function fetchData() {
-        const data = await generateMetricTreeData();
+      if (startDate && endDate) {
+        const nodes = await getMetricTreeData(startDate, endDate);
         const edges = await generateMetricTreeConnections();
-        setNodes(data);
+        setNodes(nodes);
         setEdges(edges);
-    }
+    }}
     fetchData();
   }, []);
 
-
   return (
-    <>    
+    <>
     <ReactFlow nodes={nodes}
               nodeTypes={nodeTypes} 
               edges={edges}
@@ -59,11 +60,7 @@ export default function Flow() {
               minZoom={.1}
               className="bg-gray-950">
       <Panel position="top-right">
-        <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-2'>
-          <div>
-            <CheckboxDropdown/>
-          </div>
-        </div>
+        <FilterPanel setStartDate={setStartDate} setEndDate={setEndDate}/>
       </Panel>
       <Background gap={60} size={1.5}/>
       <Controls className="bg-white"/>

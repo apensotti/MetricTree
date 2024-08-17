@@ -1,3 +1,4 @@
+import { tree } from 'next/dist/build/templates/app-page';
 import Papa from 'papaparse';
 
 interface RawDataProps {
@@ -51,6 +52,16 @@ export interface TreeDataProps {
     previous_total_appointments: number;
 }
 
+interface Attributes {
+    date: Date;
+    market: string;
+    channel: string;
+    first_appointment: number;
+    repeat_appointment: number;
+    first_revenue: number;
+    repeat_revenue: number;
+}
+
 function getAbbreviatedMonth(date: Date) {
     const monthAbbreviations = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -61,20 +72,40 @@ function getAbbreviatedMonth(date: Date) {
     return monthAbbreviations[monthIndex];
 }
 
-export async function getMetricTreeData(path: string): Promise<TreeDataProps> {
-        const response = await fetch(path);
-        const csvText = await response.text();
-        const parsed = Papa.parse<RawDataProps>(csvText, { header: true });
-        const source = parsed.data;
+export async function parseCSV(): Promise<RawDataProps[]> {
+    const response = await fetch("http://localhost:3000/metric_tree.csv");
+    const csvText = await response.text();
+    const parsed = Papa.parse<RawDataProps>(csvText, { header: true });
+    const source = parsed.data;
+    return source;
+}
+
+export async function generateMetricTreeData(startDate: Date, endDate: Date): Promise<TreeDataProps> {
+        const source = await parseCSV();
+
+        const filter1 = (item: Attributes) => item.date >= startDate && item.date <= endDate;
+        const filter2 = (item: Attributes) => item.market === "Texas";
+        const filter3 = (item: Attributes) => item.channel === "Organic";
+
+        const filters = [filter1, filter2, filter3];
 
         const data = source.map(item => ({
                 date: item.date,
-                channel_type: item.channel_type,
+                market: item.market,
+                channel: item.channel,
                 first_appointment: parseFloat(item.first_appointments_completed),
                 repeat_appointment: parseFloat(item.repeat_appointments_completed),
                 first_revenue: parseFloat(item.first_revenue),
                 repeat_revenue: parseFloat(item.repeat_revenue)
         }));
+
+        const dateRangeData = data.filter(item => {
+            const itemDate = new Date(item.date);
+            const data = itemDate >= startDate && itemDate <= endDate
+            return itemDate >= startDate && itemDate <= endDate;
+        });
+
+        const test = filters.reduce((data, filter) => data.filter(filter), data);
 
         const currentMonthData = data.filter(item => {
             const currentMonth = new Date().getMonth();
@@ -87,8 +118,6 @@ export async function getMetricTreeData(path: string): Promise<TreeDataProps> {
             const month = new Date(item.date).getMonth();
             return month === currentMonth-1;
         });
-
-        
 
         const treeData = {
             year: new Date().getFullYear(),
@@ -111,3 +140,18 @@ export async function getMetricTreeData(path: string): Promise<TreeDataProps> {
         return treeData;
 
     }
+
+export async function getPreviousTwoWeeksData(date: Date,): Promise<RawDataProps[]> {
+    const data = await parseCSV();
+
+    const twoWeeksAgo = new Date(date.getTime() - (14 * 24 * 60 * 60 * 1000));
+    const previousTwoWeeksData = data.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= twoWeeksAgo && itemDate < date;
+    });
+    return previousTwoWeeksData;
+}
+
+export function generateTree () {
+    
+}

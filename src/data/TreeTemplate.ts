@@ -1,4 +1,4 @@
-import { getMetricTreeData, TreeDataProps } from "./MetricTreeData";
+import { generateMetricTreeData, TreeDataProps } from "./MetricTreeData";
 import { type Edge, type Node, MarkerType } from "@xyflow/react";
 
 function formatNumber(num: number, currency: boolean): string {
@@ -35,8 +35,8 @@ function formatNumber(num: number, currency: boolean): string {
 }
 
 
-export async function generateMetricTreeData(): Promise<Node[]> {
-    const data: TreeDataProps = await getMetricTreeData("/metric_tree.csv");
+export async function getMetricTreeData(startDate: Date, endDate: Date): Promise<Node[]> {
+    const data: TreeDataProps = await generateMetricTreeData(startDate, endDate);
     return [
     {
         id: '1',
@@ -50,7 +50,10 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_total_revenue, true),
             change: formatNumber(data.current_total_revenue - data.previous_total_revenue, true)
         },
-        position: {x: 0, y: 0}
+        position: {x: 0, y: 0},
+        draggable: true,
+        selectable: true
+
     },
     {
         id: '2a',
@@ -78,7 +81,8 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_first_appointment, false),
             change: formatNumber(data.current_first_appointment - data.previous_first_appointment, false)
         },
-        position: {x: -700, y: 900}
+        position: {x: -700, y: 900},
+
     },
     {
         id: '3b',
@@ -140,11 +144,55 @@ export async function generateMetricTreeData(): Promise<Node[]> {
 
     export async function generateMetricTreeConnections(): Promise<Edge[]> {
         return [
-            { id: '2a->1', type: 'simplebezier', source: '1', target: '2a', markerStart: {type: MarkerType.ArrowClosed, height: 30, width: 30} },
-            { id: '2b->1', type: 'simplebezier', source: '1', target: '2b', markerStart: {type: MarkerType.ArrowClosed, height: 30, width: 30} },
-            { id: '3a->2a', type: 'simplebezier', source: '2a', target: '3a', markerStart: {type: MarkerType.ArrowClosed, height: 30, width: 30} },
-            { id: '3b->2a', type: 'simplebezier', source: '2a', target: '3b', markerStart: {type: MarkerType.ArrowClosed, height: 30, width: 30} },
-            { id: '3c->2b', type: 'simplebezier', source: '2b', target: '3c', markerStart: {type: MarkerType.ArrowClosed, height: 30, width: 30} },
-            { id: '3d->2b', type: 'simplebezier', source: '2b', target: '3d', markerStart: {type: MarkerType.ArrowClosed, height: 30, width: 30} },
+            { id: '2a->1',
+                 type: 'simplebezier', 
+                 source: '2a', 
+                 target: '1', 
+                 selectable: false,
+                 markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                 style: { strokeDasharray: '5,5' } 
+                },
+            { id: '2b->1', 
+                type: 'simplebezier', 
+                source: '2b', 
+                target: '1', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' },
+                animated: true
+            },
+            { id: '3a->2a', 
+                type: 'simplebezier', 
+                source: '3a', 
+                target: '2a', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' } 
+            },
+            { id: '3b->2a', 
+                type: 'simplebezier', 
+                source: '3b', 
+                target: '2a', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' } 
+            },
+            { id: '3c->2b', 
+                type: 'simplebezier', 
+                source: '3c', 
+                target: '2b', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' }
+            },
+            { id: '3d->2b', 
+                type: 'simplebezier', 
+                source: '3d', 
+                target: '2b', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' },
+                animated: true
+            },
           ];
     };
