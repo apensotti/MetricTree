@@ -1,5 +1,5 @@
-import { getMetricTreeData, TreeDataProps } from "./MetricTreeData";
-import { type Edge, type Node } from "@xyflow/react";
+import { generateMetricTreeData, TreeDataProps } from "./MetricTreeData";
+import { type Edge, type Node, MarkerType } from "@xyflow/react";
 
 function formatNumber(num: number, currency: boolean): string {
     if (currency === true) {
@@ -35,8 +35,8 @@ function formatNumber(num: number, currency: boolean): string {
 }
 
 
-export async function generateMetricTreeData(): Promise<Node[]> {
-    const data: TreeDataProps = await getMetricTreeData("/metric_tree.csv");
+export async function getMetricTreeData(startDate: Date, endDate: Date): Promise<Node[]> {
+    const data: TreeDataProps = await generateMetricTreeData(startDate, endDate);
     return [
     {
         id: '1',
@@ -50,7 +50,10 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_total_revenue, true),
             change: formatNumber(data.current_total_revenue - data.previous_total_revenue, true)
         },
-        position: {x: 0, y: 0}
+        position: {x: 0, y: 0},
+        draggable: true,
+        selectable: true
+
     },
     {
         id: '2a',
@@ -64,7 +67,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_first_revenue, true),
             change: formatNumber(data.current_first_revenue - data.previous_first_revenue, true)
         },
-        position: {x: -600, y: 600}
+        position: {x: -450, y: 450}
     },
     {
         id: '3a',
@@ -78,7 +81,8 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_first_appointment, false),
             change: formatNumber(data.current_first_appointment - data.previous_first_appointment, false)
         },
-        position: {x: -900, y: 1200}
+        position: {x: -700, y: 900},
+
     },
     {
         id: '3b',
@@ -92,7 +96,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber((data.current_first_revenue/data.current_first_appointment), true),
             change: formatNumber((data.current_first_revenue/data.current_first_appointment) - (data.previous_first_revenue/data.previous_first_appointment), true),
         },
-        position: {x: -300, y: 1200}
+        position: {x: -200, y: 900},
     },
     {
         id: '2b',
@@ -106,7 +110,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_repeat_revenue, true),
             change: formatNumber(data.current_repeat_revenue - data.previous_repeat_revenue, true)
         },
-        position: {x: 600, y: 600}
+        position: {x: 450, y: 450}
     },
     {
         id: '3c',
@@ -120,7 +124,7 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber(data.current_repeat_appointment, false),
             change: formatNumber(data.current_repeat_appointment - data.previous_repeat_appointment, false)
         },
-        position: {x: 300, y: 1200}
+        position: {x: 200, y: 900}
     },
     {
         id: '3d',
@@ -134,17 +138,61 @@ export async function generateMetricTreeData(): Promise<Node[]> {
             valueEnd: formatNumber((data.current_repeat_revenue/data.current_repeat_appointment), true),
             change: formatNumber((data.current_repeat_revenue/data.current_repeat_appointment) - (data.previous_repeat_revenue/data.previous_repeat_appointment), true),
         },
-        position: {x: 900, y: 1200}
+        position: {x: 700, y: 900}
     },
     ]};
 
     export async function generateMetricTreeConnections(): Promise<Edge[]> {
         return [
-            { id: '2a->1', type: 'simplebezier', source: '1', target: '2a' },
-            { id: '2b->1', type: 'simplebezier', source: '1', target: '2b' },
-            { id: '3a->2a', type: 'simplebezier', source: '2a', target: '3a' },
-            { id: '3b->2a', type: 'simplebezier', source: '2a', target: '3b' },
-            { id: '3c->2b', type: 'simplebezier', source: '2b', target: '3c' },
-            { id: '3d->2b', type: 'simplebezier', source: '2b', target: '3d' },
+            { id: '2a->1',
+                 type: 'simplebezier', 
+                 source: '2a', 
+                 target: '1', 
+                 selectable: false,
+                 markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                 style: { strokeDasharray: '5,5' } 
+                },
+            { id: '2b->1', 
+                type: 'simplebezier', 
+                source: '2b', 
+                target: '1', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' },
+                animated: true
+            },
+            { id: '3a->2a', 
+                type: 'simplebezier', 
+                source: '3a', 
+                target: '2a', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' } 
+            },
+            { id: '3b->2a', 
+                type: 'simplebezier', 
+                source: '3b', 
+                target: '2a', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' } 
+            },
+            { id: '3c->2b', 
+                type: 'simplebezier', 
+                source: '3c', 
+                target: '2b', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' }
+            },
+            { id: '3d->2b', 
+                type: 'simplebezier', 
+                source: '3d', 
+                target: '2b', 
+                selectable: false,
+                markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
+                style: { strokeDasharray: '5,5' },
+                animated: true
+            },
           ];
     };
