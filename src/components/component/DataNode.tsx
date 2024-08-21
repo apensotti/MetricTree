@@ -10,13 +10,16 @@ export type DataNode = Node<{
   valueStart: string,
   valueEnd: string,
   change: string,
-  start_month?: string,
-  end_month: string,
+  start_date: string,
+  end_date: string,
   year: number
  }, 'data'>;
 
-function getChangeClass(value: string) {
-    return value && value.startsWith('-') ? 'text-red-600' : 'text-green-600';
+ function getChangeClass(value: string) {
+  if (value === "$0.00" || value === "0.00") {
+      return 'text-gray-600';
+  }
+  return value && value.startsWith('-') ? 'text-red-600' : 'text-green-600';
 }
 
 const DataNode = ({id, data}: NodeProps<DataNode>) => {
@@ -24,11 +27,28 @@ const DataNode = ({id, data}: NodeProps<DataNode>) => {
     <>
     <div className='mb-2'>
       <Handle
+          id='top'
           type="source"
           isConnectable={false}
           className='rounded-full'
           position={Position.Top}
           style={{ opacity: 100 }}>
+      </Handle>
+      <Handle
+          id='left'
+          type="target"
+          className='rounded-full'
+          isConnectable={false}
+          position={Position.Left}
+          style={{ opacity: 0 }}>
+      </Handle>
+      <Handle
+          id='right'
+          type="source"
+          className='rounded-full'
+          isConnectable={false}
+          position={Position.Right}
+          style={{ opacity: 0 }}>
       </Handle>
     </div>
     <div id={id} className="flex flex-col items-center bg-gray-950 text-white shadow-lg">
@@ -37,24 +57,25 @@ const DataNode = ({id, data}: NodeProps<DataNode>) => {
           <div className='border-t border-b border-white flex felx-col gap-6 justify-center'>
             <div className="flex flex-col p-2">
               <p className="text-sm font-semibold ">{data.valueStart}</p>
-              <p className="text-xs pt-1 text-gray-400">{data.start_month + " " + data.year}</p>
+              <p className="text-xs pt-1 text-gray-400">{data.start_date}</p>
             </div>
             <div className="flex flex-col p-2">
               <p className="text-sm font-semibold ">{data.valueEnd}</p>
-              <p className="text-xs pt-1 text-gray-400">{data.end_month + " " + data.year}</p>
+              <p className="text-xs pt-1 text-gray-400">{data.end_date}</p>
             </div>
             <div className="flex flex-col p-2">
               <p className={`text-sm font-semibold ${getChangeClass(data.change)}`}>{data.change}</p>
               <p className="text-xs pt-1 text-gray-400">Change</p>
             </div>
           </div>
-          <div className="flex w-auto">
+          <div className="flex">
             <SparkChart/>
           </div>
         </div>
     </div>
     <div className='mt-2'>
       <Handle
+          id='bottom'
           type="target"
           className='rounded-full'
           isConnectable={false}

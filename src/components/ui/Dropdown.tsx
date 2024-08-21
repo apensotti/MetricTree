@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import React from "react"
 
 import { CaretSortIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
@@ -14,23 +14,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export function Dropdown() {
+interface DropdownProps {
+  setGrain: React.Dispatch<React.SetStateAction<string>>;
+  grain: string | undefined;
+}
+
+export function Dropdown({setGrain, grain}: DropdownProps) {
   const [position, setPosition] = React.useState("bottom")
-  const [selected, setSelected] = React.useState("")
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="secondary" className="w-5/6 justify-between">
-        {selected || "Select"}
+        {grain || "Select"}
         <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>        
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-          <DropdownMenuRadioItem value="top" onClick={() => setSelected("Week")}>Week</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="bottom" onClick={() => setSelected("Month")}>Month</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="right" onClick={() => setSelected("Year")}>Year</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="top" onClick={() => setGrain("Week")}>Week</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="bottom" onClick={() => setGrain("Month")}>Month</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="right" onClick={() => setGrain("Year")}>Year</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

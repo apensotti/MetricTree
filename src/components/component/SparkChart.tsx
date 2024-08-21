@@ -69,13 +69,14 @@ const SparkChart = () => {
       },
     },
     maintainAspectRatio: false,
-    devicePixelRatio: 4
+    devicePixelRatio: 4,
+    responsive: false,
   };
 
   return (
     <div className='overflow-hidden'>
-      <canvas ref={chartRef} style={{ display: 'none' }} />
-      <Line data={chartData} options={options} height={40}/>
+      <canvas ref={chartRef} style={{ display: 'none'}} />
+      <Line data={chartData} options={options} height={40} width={350}/>
     </div>
   );
 };
