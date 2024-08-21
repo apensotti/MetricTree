@@ -13,6 +13,7 @@ export type DataNode = Node<{
   start_date: string,
   end_date: string,
   year: number
+  chartData: number[]
  }, 'data'>;
 
  function getChangeClass(value: string) {
@@ -69,7 +70,7 @@ const DataNode = ({id, data}: NodeProps<DataNode>) => {
             </div>
           </div>
           <div className="flex">
-            <SparkChart/>
+            <SparkChart data={data.chartData}/>
           </div>
         </div>
     </div>

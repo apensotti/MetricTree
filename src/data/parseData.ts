@@ -62,6 +62,13 @@ export interface TreeDataProps {
     repeat_revenue_total_change: number;
     first_appointment_per_change: number;
     repeat_appointment_per_change: number;
+    repeat_revenue_chart: number[];
+    first_revenue_chart: number[];
+    total_revenue_chart: number[];
+    repeat_appoitnment_chart: number[];
+    first_appointment_chart: number[];
+    repeat_appointment_per_chart: number[];
+    first_appointment_per_chart: number[];
 }
 
 interface Attributes {
@@ -105,9 +112,6 @@ export async function parseData(startDate:Date,
                                 platform: string[], 
                                 channelType: string[]): Promise<TreeDataProps> {
     const source = await parseCSV();
-
-    const selectedMarkets = ['Texas', 'New York', 'Colorado', 'DMV'];
-    const selectedChannels = ['Direct', 'Google Search', 'Facebook'];
 
     const timeDifference = endDate.getTime() - startDate.getTime();
     const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
@@ -156,6 +160,51 @@ export async function parseData(startDate:Date,
         return itemDate >= expandedStartDate && itemDate <= expandedEndDate;
     });
 
+    const totalRangeData = filteredData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= expandedStartDate && itemDate <= endDate;
+    });
+
+    const aggregatedDailyData: Attributes[] = [];
+    const dateMap: { [key: string]: Attributes } = {};
+
+    totalRangeData.forEach(item => {
+        const dateKey = new Date(item.date).toISOString().split('T')[0]; // Extract the date as a key (YYYY-MM-DD format)
+
+        if (!dateMap[dateKey]) {
+            dateMap[dateKey] = {
+                date: new Date(dateKey),
+                market: item.market,
+                channel: item.channel,
+                channel_type: item.channel_type,
+                strategy: item.strategy,
+                platform: item.platform,
+                first_appointment: 0,
+                repeat_appointment: 0,
+                first_revenue: 0,
+                repeat_revenue: 0,
+            };
+        }
+
+        dateMap[dateKey].first_appointment += item.first_appointment;
+        dateMap[dateKey].repeat_appointment += item.repeat_appointment;
+        dateMap[dateKey].first_revenue += item.first_revenue;
+        dateMap[dateKey].repeat_revenue += item.repeat_revenue;
+    });
+
+    aggregatedDailyData.push(...Object.values(dateMap));
+
+    const normalizeData = (data: number[], scale: number = 1) => {
+        const min = Math.min(...data);
+        const max = Math.max(...data);
+    
+        return data.map(value => (value - min) / (max - min) * scale);
+    };
+
+    const logScaling = (data: number[]) => {
+    return data.map(value => Math.log(value + 1));
+};
+
     const treeData = {
         year: new Date().getFullYear(),
         selected_start_date: startDate.toISOString().split('T')[0],
@@ -180,8 +229,15 @@ export async function parseData(startDate:Date,
         first_revenue_total_change: selectedRangeData.reduce((total, item) => total + item.first_revenue, 0) - previousRangeData.reduce((total, item) => total + item.first_revenue, 0),
         repeat_revenue_total_change: selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0) - previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0),
         first_appointment_per_change: (selectedRangeData.reduce((total, item) => total + item.first_revenue, 0)/selectedRangeData.reduce((total, item) => total + item.first_appointment, 0)) - (previousRangeData.reduce((total, item) => total + item.first_revenue, 0)/previousRangeData.reduce((total, item) => total + item.first_appointment, 0)),
-        repeat_appointment_per_change: (selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0)/selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0)) - (previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0)/previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0))
-    };
+        repeat_appointment_per_change: (selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0)/selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0)) - (previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0)/previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0)),
+        repeat_revenue_chart: aggregatedDailyData.map(item => item.repeat_revenue),
+        first_revenue_chart: aggregatedDailyData.map(item => item.first_revenue),
+        total_revenue_chart: aggregatedDailyData.map(item => item.first_revenue + item.repeat_revenue),
+        repeat_appoitnment_chart: aggregatedDailyData.map(item => item.repeat_appointment),
+        first_appointment_chart: aggregatedDailyData.map(item => item.first_appointment),
+        repeat_appointment_per_chart: aggregatedDailyData.map(item => {const result = item.repeat_revenue / item.repeat_appointment;return isNaN(result) || !isFinite(result) ? 0 : result;}),
+        first_appointment_per_chart: aggregatedDailyData.map(item => {const result = item.first_revenue / item.first_appointment;return isNaN(result) || !isFinite(result) ? 0 : result;})
+    }; 
 
     return treeData;
 
@@ -236,7 +292,8 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             year: data.year,
             valueStart: formatNumber(data.previous_total_revenue, true),
             valueEnd: formatNumber(data.selected_total_revenue, true),
-            change: formatNumber(data.selected_total_revenue - data.previous_total_revenue, true)
+            change: formatNumber(data.selected_total_revenue - data.previous_total_revenue, true),
+            chartData: data.total_revenue_chart
         },
         position: {x: 0, y: 0},
         draggable: true,
@@ -253,7 +310,9 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             year: data.year,
             valueStart: formatNumber(data.previous_first_revenue, true),
             valueEnd: formatNumber(data.selected_first_revenue, true),
-            change: formatNumber(data.selected_first_revenue - data.previous_first_revenue, true)
+            change: formatNumber(data.selected_first_revenue - data.previous_first_revenue, true),
+            chartData: data.first_revenue_chart
+
         },
         position: {x: -450, y: 450}
     },
@@ -267,7 +326,8 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             year: data.year,
             valueStart: formatNumber(data.previous_first_appointment, false),
             valueEnd: formatNumber(data.selected_first_appointment, false),
-            change: formatNumber(data.selected_first_appointment - data.previous_first_appointment, false)
+            change: formatNumber(data.selected_first_appointment - data.previous_first_appointment, false),
+            chartData: data.first_appointment_chart
         },
         position: {x: -700, y: 900},
 
@@ -283,6 +343,7 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             valueStart: formatNumber((data.previous_first_revenue/data.previous_first_appointment), true),
             valueEnd: formatNumber((data.selected_first_revenue/data.selected_first_appointment), true),
             change: formatNumber((data.selected_first_revenue/data.selected_first_appointment) - (data.previous_first_revenue/data.previous_first_appointment), true),
+            chartData: data.first_appointment_per_chart
         },
         position: {x: -200, y: 900},
     },
@@ -296,7 +357,8 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             year: data.year,
             valueStart: formatNumber(data.previous_repeat_revenue, true),
             valueEnd: formatNumber(data.selected_repeat_revenue, true),
-            change: formatNumber(data.selected_repeat_revenue - data.previous_repeat_revenue, true)
+            change: formatNumber(data.selected_repeat_revenue - data.previous_repeat_revenue, true),
+            chartData: data.repeat_revenue_chart
         },
         position: {x: 450, y: 450}
     },
@@ -310,7 +372,8 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             year: data.year,
             valueStart: formatNumber(data.previous_repeat_appointment, false),
             valueEnd: formatNumber(data.selected_repeat_appointment, false),
-            change: formatNumber(data.selected_repeat_appointment - data.previous_repeat_appointment, false)
+            change: formatNumber(data.selected_repeat_appointment - data.previous_repeat_appointment, false),
+            chartData: data.repeat_appoitnment_chart
         },
         position: {x: 200, y: 900}
     },
@@ -325,6 +388,7 @@ export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[
             valueStart: formatNumber((data.previous_repeat_revenue/data.previous_repeat_appointment), true),
             valueEnd: formatNumber((data.selected_repeat_revenue/data.selected_repeat_appointment), true),
             change: formatNumber((data.selected_repeat_revenue/data.selected_repeat_appointment) - (data.previous_repeat_revenue/data.previous_repeat_appointment), true),
+            chartData: data.repeat_appointment_per_chart
         },
         position: {x: 700, y: 900}
     },]

@@ -52,22 +52,76 @@ const FilterPanel2 = ({ setDateRange,
         fetchUniqueValues();
     }, [])
 
+    useEffect(() => {
+        if (!filters.includes("Market")) {
+            setMarket(types.market.map(option => option.value));
+        }
+        if (!filters.includes("Channel")) {
+            setChannel(types.channel.map(option => option.value));
+        }
+        if (!filters.includes("Channel Type")) {
+            setChannelType(types.channel_type.map(option => option.value));
+        }
+        if (!filters.includes("Platform")) {
+            setPlatform(types.platform.map(option => option.value));
+        }
+        if (!filters.includes("Strategy")) {
+            setStrategy(types.strategy.map(option => option.value));
+        }
+    }, [filters, types, setMarket, setChannel, setChannelType, setPlatform, setStrategy]);
+
     const renderFilterComponent = (filter: string) => {
         switch (filter) {
             case "Market":
-                return <CheckboxDropdown key={filter} options={types.market} checkedValues={market} setCheckedValues={setMarket}/>;
+                return (
+                    <CheckboxDropdown
+                        key={filter}
+                        options={types.market}
+                        checkedValues={market}
+                        setCheckedValues={setMarket}
+                    />
+                );
             case "Channel":
-                return <CheckboxDropdown key={filter} options={types.channel} checkedValues={channel} setCheckedValues={setChannel}/>;
+                return (
+                    <CheckboxDropdown
+                        key={filter}
+                        options={types.channel}
+                        checkedValues={channel}
+                        setCheckedValues={setChannel}
+                    />
+                );
             case "Channel Type":
-                return <CheckboxDropdown key={filter} options={types.channel_type} checkedValues={channelType} setCheckedValues={setChannelType}/>;
+                return (
+                    <CheckboxDropdown
+                        key={filter}
+                        options={types.channel_type}
+                        checkedValues={channelType}
+                        setCheckedValues={setChannelType}
+                    />
+                );
             case "Platform":
-                return <CheckboxDropdown key={filter} options={types.platform} checkedValues={platform} setCheckedValues={setPlatform}/>;
+                return (
+                    <CheckboxDropdown
+                        key={filter}
+                        options={types.platform}
+                        checkedValues={platform}
+                        setCheckedValues={setPlatform}
+                    />
+                );
             case "Strategy":
-                return <CheckboxDropdown key={filter} options={types.strategy} checkedValues={strategy} setCheckedValues={setStrategy}/>;
+                return (
+                    <CheckboxDropdown
+                        key={filter}
+                        options={types.strategy}
+                        checkedValues={strategy}
+                        setCheckedValues={setStrategy}
+                    />
+                );
             default:
                 return null;
         }
     };
+
 
     return (
         <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4'>

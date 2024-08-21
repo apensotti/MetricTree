@@ -25,7 +25,7 @@ import NodeArrow from "../component/NodeArrow"
 import { format, startOfWeek, endOfWeek, subDays } from "date-fns"
 import { DateRange } from "react-day-picker"
 
-import {parseData, generateMetricTreeConnections, generateMetricTreeData } from "../../data/parseData";
+import {parseData, extractUniqueValues ,generateMetricTreeConnections, generateMetricTreeData } from "../../data/parseData";
 
 import FilterPanel from "../component/FilterPanel1";
 import FilterPanel2 from "../component/FilterPanel2";
@@ -45,8 +45,8 @@ export default function Flow() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
-    to: new Date(),
+    from: subDays(new Date(2024, 6, 16), 7),
+    to: new Date(2024, 6, 16),
   })
   const [market, setMarket] = React.useState<string[]>([])
   const [channel, setChannel] = React.useState<string[]>([])
@@ -54,17 +54,41 @@ export default function Flow() {
   const [platform, setPlatform] = React.useState<string[]>([])
   const [channelType, setChannelType] = React.useState<string[]>([])
 
+  const [initialized, setInitialized] = useState(false);
+
   useEffect(() => {
-    async function fetchData() {
+    async function initializeFilters() {
+      const uniqueValues = await extractUniqueValues();
+
+      // Initialize filter states only if they haven't been initialized yet
+      if (!initialized) {
+        setMarket(uniqueValues.market.map((option) => option.value));
+        setChannel(uniqueValues.channel.map((option) => option.value));
+        setStrategy(uniqueValues.strategy.map((option) => option.value));
+        setPlatform(uniqueValues.platform.map((option) => option.value));
+        setChannelType(uniqueValues.channel_type.map((option) => option.value));
+        setInitialized(true); // Set the flag to true after initialization
+      }
+
       if (date?.from && date?.to) {
-        const data = await parseData(date.from, date.to, market, channel, strategy, platform, channelType);
+        const data = await parseData(
+          date.from,
+          date.to,
+          market.length === 0 ? uniqueValues.market.map((option) => option.value) : market,
+          channel.length === 0 ? uniqueValues.channel.map((option) => option.value) : channel,
+          strategy.length === 0 ? uniqueValues.strategy.map((option) => option.value) : strategy,
+          platform.length === 0 ? uniqueValues.platform.map((option) => option.value) : platform,
+          channelType.length === 0 ? uniqueValues.channel_type.map((option) => option.value) : channelType
+        );
         const nodes = await generateMetricTreeData(data);
         const edges = await generateMetricTreeConnections(data);
         setNodes(nodes);
         setEdges(edges);
-    }}
-    fetchData();
-  }, [date, market, channel, strategy, platform, channelType]);
+      }
+    }
+
+    initializeFilters();
+  }, [date, initialized, market, channel, strategy, platform, channelType]);
 
   return (
     <>
