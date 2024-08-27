@@ -3,8 +3,6 @@
 import React from "react";
 import { useEffect, useState, useCallback } from "react"
 
-import Link from "next/link";
-
 import {
   Background,
   Controls,
@@ -27,10 +25,10 @@ import { DateRange } from "react-day-picker"
 
 import {parseData, extractUniqueValues ,generateMetricTreeConnections, generateMetricTreeData } from "../../data/parseData";
 
-import FilterPanel from "../component/FilterPanel1";
 import FilterPanel2 from "../component/FilterPanel2";
-import { parse } from "path";
 import OperatorArrow from "../component/OperatorArrow";
+
+
 
 const nodeTypes: NodeTypes = {
   data: DataNode,
@@ -42,12 +40,22 @@ const edgeTypes: EdgeTypes = {
 }
 
 export default function Flow() {
+  const initialDateRange = {
+    from: startOfWeek(new Date(), { weekStartsOn: 1 }),
+    to: endOfWeek(new Date(), { weekStartsOn: 1 }),
+  };
+
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: subDays(new Date(2024, 6, 16), 7),
-    to: new Date(2024, 6, 16),
+  const [range1, setDateRange1] = React.useState<DateRange | undefined>({
+    from: initialDateRange.from,
+    to: initialDateRange.to,
   })
+  const [range2, setDateRange2] = React.useState<DateRange | undefined>({
+    from: subDays(initialDateRange.from, 7),
+    to: subDays(initialDateRange.to, 7),
+  })
+  //const [period, setPeriod] = React.useState<string>("Week")
   const [market, setMarket] = React.useState<string[]>([])
   const [channel, setChannel] = React.useState<string[]>([])
   const [strategy, setStrategy] = React.useState<string[]>([])
@@ -60,20 +68,21 @@ export default function Flow() {
     async function initializeFilters() {
       const uniqueValues = await extractUniqueValues();
 
-      // Initialize filter states only if they haven't been initialized yet
       if (!initialized) {
         setMarket(uniqueValues.market.map((option) => option.value));
         setChannel(uniqueValues.channel.map((option) => option.value));
         setStrategy(uniqueValues.strategy.map((option) => option.value));
         setPlatform(uniqueValues.platform.map((option) => option.value));
         setChannelType(uniqueValues.channel_type.map((option) => option.value));
-        setInitialized(true); // Set the flag to true after initialization
+        setInitialized(true);
       }
 
-      if (date?.from && date?.to) {
+      if (range1?.from && range1?.to && range2?.from && range2?.to) {
         const data = await parseData(
-          date.from,
-          date.to,
+          range1.from,
+          range1.to,
+          range2.from,
+          range2.to,
           market.length === 0 ? uniqueValues.market.map((option) => option.value) : market,
           channel.length === 0 ? uniqueValues.channel.map((option) => option.value) : channel,
           strategy.length === 0 ? uniqueValues.strategy.map((option) => option.value) : strategy,
@@ -88,7 +97,7 @@ export default function Flow() {
     }
 
     initializeFilters();
-  }, [date, initialized, market, channel, strategy, platform, channelType]);
+  }, [range1, range2 ,initialized, market, channel, strategy, platform, channelType]);
 
   return (
     <>
@@ -101,8 +110,10 @@ export default function Flow() {
               minZoom={.1}
               className="bg-gray-950">
       <Panel position="top-right">
-        <FilterPanel2 setDateRange={setDate} 
-                      date={date}
+        <FilterPanel2 setDateRange1={setDateRange1} 
+                      range1={range1}
+                      setDateRange2={setDateRange2}
+                      range2={range2}
                       setMarket={setMarket}
                       market={market}
                       setChannel={setChannel}

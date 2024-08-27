@@ -3,86 +3,7 @@ import { type Edge, type Node, MarkerType } from "@xyflow/react";
 import Papa from 'papaparse';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { format } from 'path';
-
-interface RawDataProps {
-    date: Date;
-    year: string;
-    month: string;
-    week_start_date: Date;
-    week_number: string;
-    week_number_year: string;
-    trailing_7d: string;
-    attribution_type: string;
-    channel_type: string;
-    strategy: string;
-    platform: string;
-    channel: string;
-    market: string;
-    investment: string;
-    agency_fees: string;
-    violet_fee: string;
-    sessions: string;
-    phone_calls: string;
-    form_submissions: string;
-    leads: string;
-    first_appointments_completed: string;
-    second_appointments_completed: string;
-    repeat_appointments_completed: string;
-    first_revenue: string;
-    repeat_revenue: string;
-    twenty_one_days_revenue: string;
-    twenty_eight_days_revenue: string;
-    ninety_days_revenue: string;
-    one_hundred_eighty_days_revenue: string;
-    contribution_margin: string;
-}
-
-export interface TreeDataProps {
-    year: number;
-    selected_start_date: string;
-    selected_end_date: string;
-    selected_first_appointment: number;
-    selected_repeat_appointment: number;
-    selected_first_revenue: number;
-    selected_repeat_revenue: number;
-    selected_total_revenue: number;
-    selected_total_appointments: number;
-    previous_start_date: string;
-    previous_end_date: string;
-    previous_first_appointment: number;
-    previous_repeat_appointment: number;
-    previous_first_revenue: number;
-    previous_repeat_revenue: number;
-    previous_total_revenue: number;
-    previous_total_appointments: number;
-    revenue_total_change: number;
-    repeat_appointment_total_change: number; 
-    first_appointment_total_change: number;
-    first_revenue_total_change: number;
-    repeat_revenue_total_change: number;
-    first_appointment_per_change: number;
-    repeat_appointment_per_change: number;
-    repeat_revenue_chart: number[];
-    first_revenue_chart: number[];
-    total_revenue_chart: number[];
-    repeat_appoitnment_chart: number[];
-    first_appointment_chart: number[];
-    repeat_appointment_per_chart: number[];
-    first_appointment_per_chart: number[];
-}
-
-interface Attributes {
-    date: Date;
-    market: string;
-    channel: string;
-    channel_type: string;
-    strategy: string;
-    platform: string;
-    first_appointment: number;
-    repeat_appointment: number;
-    first_revenue: number;
-    repeat_revenue: number;
-}
+import { TreeDataProps, ParsedProps, RawDataProps } from './props';
 
 function getAbbreviatedMonth(date: Date) {
     const monthAbbreviations = [
@@ -104,8 +25,10 @@ export async function parseCSV(): Promise<RawDataProps[]> {
 
 // function to filter data
 
-export async function parseData(startDate:Date,
-                                endDate: Date, 
+export async function parseData(range1_from: Date,
+                                range1_to: Date,
+                                range2_to: Date,
+                                range2_from: Date,
                                 market: string[], 
                                 channel: string[], 
                                 strategy: string[], 
@@ -113,25 +36,20 @@ export async function parseData(startDate:Date,
                                 channelType: string[]): Promise<TreeDataProps> {
     const source = await parseCSV();
 
-    const timeDifference = endDate.getTime() - startDate.getTime();
-    const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    // Calculate the previous X days selected by the user
 
-    const expandedStartDate = new Date(startDate);
-    expandedStartDate.setDate(startDate.getDate() - dayDifference);
+    // Calculate previous periods (past Week, Month, Quarter, Year) for comparison
 
-    const expandedEndDate = new Date(startDate);
-    expandedEndDate.setDate(startDate.getDate() - 1);
-
-    const dateFilter = (item: Attributes) => {
+    const dateFilter = (item: ParsedProps) => {
         const itemDate = new Date(item.date); 
-        return itemDate >= expandedStartDate && itemDate <= endDate;
+        return itemDate >= range1_from && itemDate <= range2_to;
     };
 
-    const marketFilter = (item: Attributes) => market.includes(item.market);
-    const channelFilter = (item: Attributes) => channel.includes(item.channel);
-    const strategyFilter = (item: Attributes) => strategy.includes(item.strategy);
-    const platformFilter = (item: Attributes) => platform.includes(item.platform);
-    const channelTypeFilter = (item: Attributes) => channelType.includes(item.channel_type);
+    const marketFilter = (item: ParsedProps) => market.includes(item.market);
+    const channelFilter = (item: ParsedProps) => channel.includes(item.channel);
+    const strategyFilter = (item: ParsedProps) => strategy.includes(item.strategy);
+    const platformFilter = (item: ParsedProps) => platform.includes(item.platform);
+    const channelTypeFilter = (item: ParsedProps) => channelType.includes(item.channel_type);
 
     const filters = [dateFilter, marketFilter, channelFilter, strategyFilter, platformFilter, channelTypeFilter];
 
@@ -152,21 +70,21 @@ export async function parseData(startDate:Date,
 
     const selectedRangeData = filteredData.filter(item => {
         const itemDate = new Date(item.date);
-        return itemDate >= startDate && itemDate <= endDate;
+        return itemDate >= range1_from && itemDate <= range1_to;
     });
 
     const previousRangeData = filteredData.filter(item => {
         const itemDate = new Date(item.date);
-        return itemDate >= expandedStartDate && itemDate <= expandedEndDate;
+        return itemDate >= range2_from && itemDate <= range2_to;
     });
 
     const totalRangeData = filteredData.filter(item => {
         const itemDate = new Date(item.date);
-        return itemDate >= expandedStartDate && itemDate <= endDate;
+        return itemDate >= range1_from && itemDate <= range2_to;
     });
 
-    const aggregatedDailyData: Attributes[] = [];
-    const dateMap: { [key: string]: Attributes } = {};
+    const aggregatedDailyData: ParsedProps[] = [];
+    const dateMap: { [key: string]: ParsedProps } = {};
 
     totalRangeData.forEach(item => {
         const dateKey = new Date(item.date).toISOString().split('T')[0]; // Extract the date as a key (YYYY-MM-DD format)
@@ -202,34 +120,70 @@ export async function parseData(startDate:Date,
     };
 
     const logScaling = (data: number[]) => {
-    return data.map(value => Math.log(value + 1));
-};
+        return data.map(value => Math.log(value + 1));
+    };
 
-    const treeData = {
+    const calculatePercentageChange = (currentValue: number, previousValue: number): number => {    
+        if (previousValue === 0) {
+            return currentValue === 0 ? 0 : 100; 
+        }
+        return ((currentValue - previousValue) / previousValue) * 100;
+    };
+
+    const calculateChange = (currentValue: number, previousValue: number): number => {
+        return currentValue - previousValue;
+    };
+
+    const treeData: TreeDataProps = {
         year: new Date().getFullYear(),
-        selected_start_date: startDate.toISOString().split('T')[0],
-        selected_end_date: endDate.toISOString().split('T')[0],
+        selected_start_date: range2_from.toISOString().split('T')[0],
+        selected_end_date: range2_to.toISOString().split('T')[0],
         selected_first_appointment: selectedRangeData.reduce((total, item) => total + item.first_appointment, 0),
         selected_repeat_appointment: selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0),
         selected_first_revenue: selectedRangeData.reduce((total, item) => total + item.first_revenue, 0),
         selected_repeat_revenue: selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0),
         selected_total_revenue: selectedRangeData.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0),
         selected_total_appointments: selectedRangeData.reduce((total, item) => total + item.first_appointment + item.repeat_appointment, 0),
-        previous_start_date: expandedStartDate.toISOString().split('T')[0],
-        previous_end_date: expandedEndDate.toISOString().split('T')[0],
+        previous_start_date: range1_from.toISOString().split('T')[0],
+        previous_end_date: range1_to.toISOString().split('T')[0],
         previous_first_appointment: previousRangeData.reduce((total, item) => total + item.first_appointment, 0),
         previous_repeat_appointment: previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0),
         previous_first_revenue: previousRangeData.reduce((total, item) => total + item.first_revenue, 0),
         previous_repeat_revenue: previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0),
         previous_total_revenue: previousRangeData.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0),
         previous_total_appointments: previousRangeData.reduce((total, item) => total + item.first_appointment + item.repeat_appointment, 0),
-        revenue_total_change: selectedRangeData.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0) - previousRangeData.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0),
-        first_appointment_total_change: selectedRangeData.reduce((total, item) => total + item.first_appointment, 0) - previousRangeData.reduce((total, item) => total + item.first_appointment, 0),
-        repeat_appointment_total_change: selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0) - previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0),
-        first_revenue_total_change: selectedRangeData.reduce((total, item) => total + item.first_revenue, 0) - previousRangeData.reduce((total, item) => total + item.first_revenue, 0),
-        repeat_revenue_total_change: selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0) - previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0),
-        first_appointment_per_change: (selectedRangeData.reduce((total, item) => total + item.first_revenue, 0)/selectedRangeData.reduce((total, item) => total + item.first_appointment, 0)) - (previousRangeData.reduce((total, item) => total + item.first_revenue, 0)/previousRangeData.reduce((total, item) => total + item.first_appointment, 0)),
-        repeat_appointment_per_change: (selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0)/selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0)) - (previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0)/previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0)),
+        revenue_total_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0),
+            previousRangeData.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0)
+        ),
+        first_appointment_total_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.first_appointment, 0),
+            previousRangeData.reduce((total, item) => total + item.first_appointment, 0)
+        ),
+        repeat_appointment_total_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0),
+            previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0)
+        ),
+        first_revenue_total_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.first_revenue, 0),
+            previousRangeData.reduce((total, item) => total + item.first_revenue, 0)
+        ),
+        repeat_revenue_total_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0),
+            previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0)
+        ),
+        first_appointment_per_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.first_revenue, 0) /
+                selectedRangeData.reduce((total, item) => total + item.first_appointment, 0),
+            previousRangeData.reduce((total, item) => total + item.first_revenue, 0) /
+                previousRangeData.reduce((total, item) => total + item.first_appointment, 0)
+        ),
+        repeat_appointment_per_change: calculatePercentageChange(
+            selectedRangeData.reduce((total, item) => total + item.repeat_revenue, 0) /
+                selectedRangeData.reduce((total, item) => total + item.repeat_appointment, 0),
+            previousRangeData.reduce((total, item) => total + item.repeat_revenue, 0) /
+                previousRangeData.reduce((total, item) => total + item.repeat_appointment, 0)
+        ),
         repeat_revenue_chart: aggregatedDailyData.map(item => item.repeat_revenue),
         first_revenue_chart: aggregatedDailyData.map(item => item.first_revenue),
         total_revenue_chart: aggregatedDailyData.map(item => item.first_revenue + item.repeat_revenue),
@@ -278,6 +232,17 @@ export function formatNumber(num: number, currency: boolean): string {
         }   
     }
 };
+
+export function formatPercentageChange(num: number): string {
+    const formattedNum = Math.abs(num).toFixed(2);
+    if (num > 0) {
+        return `+${formattedNum}%`;
+    } else if (num < 0) {
+        return `-${formattedNum}%`;
+    } else {
+        return '0.00%';
+    }
+}
 
 export async function generateMetricTreeData(data: TreeDataProps): Promise<Node[]> {
 
@@ -403,7 +368,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             sourceHandle: 'top',
             targetHandle: 'bottom',
             data: {
-                label: formatNumber(data.first_revenue_total_change, true),
+                label: formatPercentageChange(data.first_revenue_total_change),
             },
             selectable: false,
             markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
@@ -416,7 +381,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             sourceHandle: 'top',
             targetHandle: 'bottom',
             data: {
-                label: formatNumber(data.repeat_revenue_total_change, true),
+                label: formatPercentageChange(data.repeat_revenue_total_change),
             },
             selectable: false,
             markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
@@ -430,7 +395,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             sourceHandle: 'top',
             targetHandle: 'bottom',
             data: {
-                label: formatNumber(data.first_appointment_total_change, false),
+                label: formatPercentageChange(data.first_appointment_total_change),
             },
             selectable: false,
             markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
@@ -443,7 +408,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             sourceHandle: 'top',
             targetHandle: 'bottom',
             data: {
-                label: formatNumber(data.first_appointment_per_change, true),
+                label: formatPercentageChange(data.first_appointment_per_change),
             },
             selectable: false,
             markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
@@ -456,7 +421,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             sourceHandle: 'top',
             targetHandle: 'bottom',
             data: {
-                label: formatNumber(data.repeat_appointment_total_change, false),
+                label: formatPercentageChange(data.repeat_appointment_total_change),
             },
             selectable: false,
             markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
@@ -469,7 +434,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             sourceHandle: 'top',
             targetHandle: 'bottom',
             data: {
-                label: formatNumber(data.repeat_appointment_per_change, true),
+                label: formatPercentageChange(data.repeat_appointment_per_change),
             },
             selectable: false,
             markerEnd: {type: MarkerType.ArrowClosed, height: 30, width: 30}, 
