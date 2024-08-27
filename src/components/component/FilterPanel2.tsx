@@ -4,6 +4,7 @@ import { DateRange } from 'react-day-picker'
 import { CheckboxDropdown } from '../ui/custom-ui/DropdownCheckbox'
 import { DateRangeDaily } from '../ui/custom-ui/DateRangeDaily'
 import { Dropdown } from '../ui/custom-ui/DropdownBasic'
+import { DateRangeMonthly } from '../ui/custom-ui/DateRangeMonthly'
 import { DropdownMultiSelect } from '../ui/custom-ui/DropdownMultiSelect'
 
 import { extractUniqueValues } from '@/data/parseData'

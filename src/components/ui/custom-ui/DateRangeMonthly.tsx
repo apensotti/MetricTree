@@ -15,7 +15,7 @@ interface YearMonthRangePickerProps {
   className?: React.HTMLAttributes<HTMLDivElement>;
 }
 
-export function YearMonthRangePicker({ className }: YearMonthRangePickerProps) {
+export function DateRangeMonthly({ className }: YearMonthRangePickerProps) {
   const [startYear, setStartYear] = useState(new Date().getFullYear())
   const [selectedRange, setSelectedRange] = useState<{ from?: { year: number; month: number }, to?: { year: number; month: number } }>({})
 
