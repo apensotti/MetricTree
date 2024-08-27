@@ -16,7 +16,7 @@ function getAbbreviatedMonth(date: Date) {
 }
 
 export async function parseCSV(): Promise<RawDataProps[]> {
-    const response = await fetch("http://localhost:3000/api/csv");
+    const response = await fetch("/api/csv");
     const csvText = await response.text();
     const parsed = Papa.parse<RawDataProps>(csvText, { header: true });
     const source = parsed.data;
@@ -466,7 +466,7 @@ export async function generateMetricTreeConnections(data: TreeDataProps): Promis
             style: { strokeDasharray: '5,5' },
             animated: false
         },
-        { id: '2a->2b', 
+        { id: '2b->2a', 
             type: "custom-edge", 
             source: '2a', 
             target: '2b', 
