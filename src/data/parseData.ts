@@ -16,7 +16,7 @@ function getAbbreviatedMonth(date: Date) {
 }
 
 export async function parseCSV(): Promise<RawDataProps[]> {
-    const response = await fetch("http://localhost:3000/metric_tree.csv");
+    const response = await fetch("http://localhost:3000/api/csv");
     const csvText = await response.text();
     const parsed = Papa.parse<RawDataProps>(csvText, { header: true });
     const source = parsed.data;
