@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { CalendarIcon } from "@radix-ui/react-icons"
-import { addDays, format } from "date-fns"
-
+import { addDays, format, differenceInCalendarDays } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -16,7 +15,10 @@ import {
 
 import { DateRangeSelectionProps } from "@/data/props"
 
-export function DateRangeDaily({className, setDateRange, date}: DateRangeSelectionProps) {  
+export function DateRangeDaily({ className, setDateRange, range }: DateRangeSelectionProps) {
+  const midpointDate = range?.from && range?.to 
+    ? addDays(range.from, Math.floor(differenceInCalendarDays(range.to, range.from) / 2))
+    : null
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -27,21 +29,21 @@ export function DateRangeDaily({className, setDateRange, date}: DateRangeSelecti
             variant={"secondary"}
             className={cn(
               "w-7/8 justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !range && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
+            {range?.from ? (
+              range.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
+                  {format(range.from, "LLL dd, y")} -{" "}
+                  {format(range.to, "LLL dd, y")}
                 </>
               ) : (
-                format(date.from, "LLL dd, y")
+                format(range.from, "LLL dd, y")
               )
             ) : (
-              <span>Pick a date</span>
+              <span>Pick a range</span>
             )}
           </Button>
         </PopoverTrigger>
@@ -49,10 +51,16 @@ export function DateRangeDaily({className, setDateRange, date}: DateRangeSelecti
           <Calendar
             initialFocus
             mode="range"
-            defaultMonth={date?.from}
-            selected={date}
+            defaultMonth={range?.from}
+            selected={range}
             onSelect={setDateRange}
             numberOfMonths={2}
+            modifiers={{
+              midpoint: midpointDate ? [midpointDate] : []
+            }}
+            modifiersStyles={{
+              midpoint: { backgroundColor: "#FFFFFF", color: "#000000", borderRadius: "50%" }
+            }}
           />
         </PopoverContent>
       </Popover>

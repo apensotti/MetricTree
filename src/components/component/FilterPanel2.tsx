@@ -9,13 +9,14 @@ import { DropdownMultiSelect } from '../ui/custom-ui/DropdownMultiSelect'
 
 import { extractUniqueValues } from '@/data/parseData'
 import { types } from '@/data/parseData'
-import { setDate } from 'date-fns'
 
 import { FilterPanelProps } from '@/data/props'
+import { DateRangeWeekly } from '../ui/custom-ui/DateRangeWeekly'
+import { DateRangeMonthly2 } from '../ui/custom-ui/DateRangeMonthly copy'
 
 const FilterPanel2 = ({
-    setDateRange1,range1,
-    setDateRange2,range2,
+    setDateRange,
+    range,
     setMarket, 
     market, 
     setChannel, 
@@ -27,6 +28,7 @@ const FilterPanel2 = ({
     setChannelType, 
     channelType }: FilterPanelProps) => {
 
+    const [grain, setGrain] = React.useState<string>("Day")
     const [filters, setFilters] = React.useState<string[]>([])
     const [dropdownOptions, setDropdownOptions] = React.useState<types>({
         market: [],
@@ -114,20 +116,39 @@ const FilterPanel2 = ({
         }
     };
 
+    const renderGrainComponent = (grain: string) => {
+        switch (grain) {
+            case "Day":
+                return (
+                    <DateRangeDaily setDateRange={setDateRange} range={range}/>
+                );
+            case "Month":
+                return (
+                    <DateRangeMonthly2/>
+                );
+            case "Year":
+                return (
+                    <DateRangeWeekly setDateRange={setDateRange} date={range}/>
+                );
+            default:
+                return null;
+        }
+    }
+
+    const grainOptions = [
+        { value: "Day", label: "Day" },
+        { value: "Month", label: "Month" },
+        { value: "Year", label: "Year" },
+    ]
+
     return (
         <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4'>
             <div className="flex flex-col space-y-4">
                 <div>
-                    <h1 className="text-white pb-2 text-md font-semibold">Range Comparison</h1>
-                    <div className="flex-col justify-between pl-2 p-2">
-                        <h1 className="text-white pb-2 text-sm font-semibold">Range 1</h1>
-                        <DateRangeDaily setDateRange={setDateRange1} date={range1}></DateRangeDaily>
-                    </div>
-                    <div className="flex-col justify-between pl-2">
-                        <h1 className="text-white pb-2 text-sm font-semibold">Range 2</h1>
-                        <DateRangeDaily setDateRange={setDateRange2} date={range2}></DateRangeDaily>
-                    </div>
+                    <h1 className="text-white pb-2 text-md font-semibold">Grain</h1>
+                    <Dropdown optionsList={grainOptions} setOption={setGrain} option={grain}></Dropdown>
                 </div>
+                {renderGrainComponent(grain)}
                 <div className='flex justify-between'>
                   <h1 className="text-white pb-2 text-md font-semibold">Filters</h1>
                   <DropdownMultiSelect setFilter={setFilters} filters={filters} />

@@ -52,22 +52,22 @@ export interface ParsedProps {
 //parsed data for the Metrics in the Tree
 export interface TreeDataProps {
     year: number;
-    selected_start_date: string;
-    selected_end_date: string;
-    selected_first_appointment: number;
-    selected_repeat_appointment: number;
-    selected_first_revenue: number;
-    selected_repeat_revenue: number;
-    selected_total_revenue: number;
-    selected_total_appointments: number;
-    previous_start_date: string;
-    previous_end_date: string;
-    previous_first_appointment: number;
-    previous_repeat_appointment: number;
-    previous_first_revenue: number;
-    previous_repeat_revenue: number;
-    previous_total_revenue: number;
-    previous_total_appointments: number;
+    range1_start_date: string | Date;
+    range1_end_date: string | Date;
+    range1_first_appointment: number;
+    range1_repeat_appointment: number;
+    range1_first_revenue: number;
+    range1_repeat_revenue: number;
+    range1_total_revenue: number;
+    range1_total_appointments: number;
+    range2_start_date: string| Date;
+    range2_end_date: string| Date;
+    range2_first_appointment: number;
+    range2_repeat_appointment: number;
+    range2_first_revenue: number;
+    range2_repeat_revenue: number;
+    range2_total_revenue: number;
+    range2_total_appointments: number;
     revenue_total_change: number;
     repeat_appointment_total_change: number; 
     first_appointment_total_change: number;
@@ -89,10 +89,8 @@ export interface TreeDataProps {
 // FilterPanel2.tsx
 
 export interface FilterPanelProps {
-    setDateRange1: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-    range1: DateRange | undefined;
-    setDateRange2: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-    range2: DateRange | undefined;
+    setDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+    range: DateRange | undefined;
     setMarket: React.Dispatch<React.SetStateAction<string[]>>;
     market: string[];
     setChannel: React.Dispatch<React.SetStateAction<string[]>>;
@@ -112,7 +110,7 @@ import { DateRange } from "react-day-picker"
 export interface DateRangeSelectionProps {
     className?: React.HTMLAttributes<HTMLDivElement>
     setDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-    date: DateRange | undefined;
+    range: DateRange | undefined;
   }
 
 // DropdownCheckbox.tsx

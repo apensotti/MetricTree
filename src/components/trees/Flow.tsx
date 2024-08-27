@@ -47,13 +47,9 @@ export default function Flow() {
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [range1, setDateRange1] = React.useState<DateRange | undefined>({
+  const [range, setDateRange] = React.useState<DateRange | undefined>({
     from: initialDateRange.from,
     to: initialDateRange.to,
-  })
-  const [range2, setDateRange2] = React.useState<DateRange | undefined>({
-    from: subDays(initialDateRange.from, 7),
-    to: subDays(initialDateRange.to, 7),
   })
   //const [period, setPeriod] = React.useState<string>("Week")
   const [market, setMarket] = React.useState<string[]>([])
@@ -77,12 +73,10 @@ export default function Flow() {
         setInitialized(true);
       }
 
-      if (range1?.from && range1?.to && range2?.from && range2?.to) {
+      if (range?.from && range?.to) {
         const data = await parseData(
-          range1.from,
-          range1.to,
-          range2.from,
-          range2.to,
+          range.from,
+          range.to,
           market.length === 0 ? uniqueValues.market.map((option) => option.value) : market,
           channel.length === 0 ? uniqueValues.channel.map((option) => option.value) : channel,
           strategy.length === 0 ? uniqueValues.strategy.map((option) => option.value) : strategy,
@@ -97,7 +91,7 @@ export default function Flow() {
     }
 
     initializeFilters();
-  }, [range1, range2 ,initialized, market, channel, strategy, platform, channelType]);
+  }, [range ,initialized, market, channel, strategy, platform, channelType]);
 
   return (
     <>
@@ -110,10 +104,8 @@ export default function Flow() {
               minZoom={.1}
               className="bg-gray-950">
       <Panel position="top-right">
-        <FilterPanel2 setDateRange1={setDateRange1} 
-                      range1={range1}
-                      setDateRange2={setDateRange2}
-                      range2={range2}
+        <FilterPanel2 setDateRange={setDateRange} 
+                      range={range}
                       setMarket={setMarket}
                       market={market}
                       setChannel={setChannel}
