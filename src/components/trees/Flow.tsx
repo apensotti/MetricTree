@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback } from "react";
+import Draggable from "react-draggable"; // Import Draggable
 
 import {
   Background,
@@ -29,8 +30,6 @@ import FilterPanel2 from "../component/FilterPanel2";
 import OperatorArrow from "../component/OperatorArrow";
 import { TreeDataProps } from "@/data/props";
 
-
-
 const nodeTypes: NodeTypes = {
   data: DataNode,
 };
@@ -42,8 +41,8 @@ const edgeTypes: EdgeTypes = {
 
 export default function Flow() {
   const initialDateRange = {
-    from: startOfWeek(new Date(), { weekStartsOn: 1 }),
-    to: endOfWeek(new Date(), { weekStartsOn: 1 }),
+    from: new Date("2024-08-02"),
+    to: new Date("2024-08-16"),
   };
 
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -87,8 +86,10 @@ export default function Flow() {
           platform.length === 0 ? uniqueValues.platform.map((option) => option.value) : platform,
           channelType.length === 0 ? uniqueValues.channel_type.map((option) => option.value) : channelType
         );
+
         const nodes = await generateMetricTreeData(data);
         const edges = await generateMetricTreeConnections(data);
+        
         setNodes(nodes);
         setEdges(edges);
         setData(data);
@@ -96,7 +97,7 @@ export default function Flow() {
     }
 
     initializeFilters();
-  }, [range ,initialized, market, channel, strategy, platform, channelType]);
+  }, [range, initialized, market, channel, strategy, platform, channelType]);
 
   return (
     <>
@@ -109,20 +110,26 @@ export default function Flow() {
               minZoom={.1}
               className="bg-gray-950">
       <Panel position="top-right">
-        <FilterPanel2 setDateRange={setDateRange} 
-                      range={range}
-                      setMarket={setMarket}
-                      market={market}
-                      setChannel={setChannel}
-                      channel={channel}
-                      setStrategy={setStrategy}
-                      strategy={strategy}
-                      setPlatform={setPlatform}
-                      platform={platform}
-                      setChannelType={setChannelType}
-                      channelType={channelType}
-                      data={data}/>
-      </Panel>
+      <Draggable>
+        <div className="draggable-container">
+          <FilterPanel2 
+            setDateRange={setDateRange} 
+            range={range}
+            setMarket={setMarket}
+            market={market}
+            setChannel={setChannel}
+            channel={channel}
+            setStrategy={setStrategy}
+            strategy={strategy}
+            setPlatform={setPlatform}
+            platform={platform}
+            setChannelType={setChannelType}
+            channelType={channelType}
+            data={data}
+          />
+        </div>
+      </Draggable>
+    </Panel>
       <Background gap={60} size={1.5}/>
       <Controls className="bg-white"/>
     </ReactFlow>

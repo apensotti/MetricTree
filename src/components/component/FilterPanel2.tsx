@@ -7,6 +7,7 @@ import { Dropdown } from '../ui/custom-ui/DropdownBasic'
 import { DateRangeMonthly } from '../ui/custom-ui/DateRangeMonthly'
 import { DropdownMultiSelect } from '../ui/custom-ui/DropdownMultiSelect'
 
+import { DragHandleDots1Icon } from '@radix-ui/react-icons'
 import { extractUniqueValues } from '@/data/parseData'
 import { types } from '@/data/parseData'
 
@@ -153,13 +154,13 @@ const FilterPanel2 = ({
 
     const formatDate = (dateString: string | Date) => {
         if (!dateString) {
-            return "Invalid Date";
+            return " ";
         }
     
         const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     
         if (isNaN(date.getTime())) {
-            return "Invalid Date";
+            return " ";
         }
     
         const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit' });
@@ -168,7 +169,10 @@ const FilterPanel2 = ({
 
     return (
         <div className='flex justify-between gap-4'>
-            <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4'>
+            <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4 relative'>
+                <div className='absolute top-2 right-2'>
+                    <DragHandleDots1Icon className='text-white cursor-pointer'/>
+                </div>
                 <div className='flex'>
                     <div className='p-2 pt-0'>
                         <h1 className='text-white text-xs pr-4 font-bold pl-1'>Range A:</h1>
@@ -192,8 +196,8 @@ const FilterPanel2 = ({
                     </div>
                     {renderGrainComponent(grain)}
                     <div className='flex justify-between'>
-                      <h1 className="text-white pb-2 text-md font-bold">Filters</h1>
-                      <DropdownMultiSelect setFilter={setFilters} filters={filters} />
+                        <h1 className="text-white pb-2 text-md font-bold">Filters</h1>
+                        <DropdownMultiSelect setFilter={setFilters} filters={filters} />
                     </div>
                     <div className="flex flex-col space-y-2">
                         {filters.map(filter => (
@@ -207,6 +211,7 @@ const FilterPanel2 = ({
             </div>
         </div>
     )
+    
 }
 
 export default FilterPanel2
