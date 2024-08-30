@@ -10,6 +10,7 @@ import { DropdownMultiSelect } from '../ui/custom-ui/DropdownMultiSelect'
 import { DragHandleDots1Icon } from '@radix-ui/react-icons'
 import { extractUniqueValues } from '@/data/parseData'
 import { types } from '@/data/parseData'
+import Draggable from 'react-draggable'
 
 import { FilterPanelProps } from '@/data/props'
 import { DateRangeWeekly } from '../ui/custom-ui/DateRangeWeekly'
@@ -168,10 +169,10 @@ const FilterPanel2 = ({
     }
 
     return (
-        <div className='flex justify-between gap-4'>
+        <Draggable handle=".drag-handle">
             <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4 relative'>
-                <div className='absolute top-2 right-2'>
-                    <DragHandleDots1Icon className='text-white cursor-pointer'/>
+                <div className='absolute top-2 right-2 drag-handle cursor-pointer'>
+                    <DragHandleDots1Icon className='text-white'/>
                 </div>
                 <div className='flex'>
                     <div className='p-2 pt-0'>
@@ -187,10 +188,10 @@ const FilterPanel2 = ({
                     <div>
                         <h1 className="text-white pb-2 text-md font-bold">Date</h1>
                         <div className='flex justify-evenly gap-4'>
-                            <Dropdown optionsList={grainOptions} setOption={setGrain} option={grain}></Dropdown>
+                            <Dropdown optionsList={grainOptions} setOption={setGrain} option={grain} />
                             <div className='flex-row text-center'>
                                 <h1 className="text-white pb-1 text-xs font-normal">Compare</h1>
-                                <Switch checked={isSwitchChecked} onCheckedChange={setIsSwitchChecked}/>
+                                <Switch checked={isSwitchChecked} onCheckedChange={setIsSwitchChecked} />
                             </div>
                         </div>
                     </div>
@@ -209,8 +210,8 @@ const FilterPanel2 = ({
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        </Draggable>
+    );
     
 }
 

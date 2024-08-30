@@ -110,8 +110,6 @@ export default function Flow() {
               minZoom={.1}
               className="bg-gray-950">
       <Panel position="top-right">
-      <Draggable>
-        <div className="draggable-container">
           <FilterPanel2 
             setDateRange={setDateRange} 
             range={range}
@@ -127,8 +125,6 @@ export default function Flow() {
             channelType={channelType}
             data={data}
           />
-        </div>
-      </Draggable>
     </Panel>
       <Background gap={60} size={1.5}/>
       <Controls className="bg-white"/>
