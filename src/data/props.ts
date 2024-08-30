@@ -101,13 +101,14 @@ export interface FilterPanelProps {
     platform: string[];
     setChannelType: React.Dispatch<React.SetStateAction<string[]>>;
     channelType: string[];
+    data: TreeDataProps;
 }
 
 // DailyRangeSelection.tsx
 
 import { DateRange } from "react-day-picker"
 
-export interface DateRangeSelectionProps {
+export interface CalendarProps {
     className?: React.HTMLAttributes<HTMLDivElement>
     setDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
     range: DateRange | undefined;

@@ -13,9 +13,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-import { DateRangeSelectionProps } from "@/data/props"
+import { CalendarProps } from "@/data/props"
 
-export function DateRangeDaily({ className, setDateRange, range }: DateRangeSelectionProps) {
+export function DateRangeDaily({ className, setDateRange, range }: CalendarProps) {
   const midpointDate = range?.from && range?.to 
     ? addDays(range.from, Math.floor(differenceInCalendarDays(range.to, range.from) / 2))
     : null

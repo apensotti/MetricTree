@@ -1,59 +1,57 @@
-"use client"
+import React, { useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon } from "@radix-ui/react-icons";
+import { format, setMonth, isBefore, startOfMonth, endOfMonth } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarProps } from "@/data/props";
 
-import React, { useState } from "react"
-import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon } from "@radix-ui/react-icons"
-import { format, addYears, setMonth, isBefore } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+export function DateRangeMonthly({ className, setDateRange, range }: CalendarProps) {
+  const [startYear, setStartYear] = useState(new Date().getFullYear());
 
-interface YearMonthRangePickerProps {
-  className?: React.HTMLAttributes<HTMLDivElement>;
-}
-
-export function DateRangeMonthly({ className }: YearMonthRangePickerProps) {
-  const [startYear, setStartYear] = useState(new Date().getFullYear())
-  const [selectedRange, setSelectedRange] = useState<{ from?: { year: number; month: number }, to?: { year: number; month: number } }>({})
-
-  const months = Array.from({ length: 12 }, (_, index) =>
-    format(setMonth(new Date(), index), "MMM")
-  )
+  const months = Array.from({ length: 12 }, (_, index) => format(setMonth(new Date(), index), "MMM"));
 
   const handleMonthSelect = (year: number, month: number) => {
-    if (!selectedRange.from || (selectedRange.from && selectedRange.to)) {
-      setSelectedRange({ from: { year, month }, to: undefined })
-    } else if (selectedRange.from) {
-      const isFromBeforeTo = isBefore(new Date(year, month), new Date(selectedRange.from.year, selectedRange.from.month))
+    const selectedDate = new Date(year, month);
+    if (!range?.from || (range.from && range.to)) {
+      setDateRange({
+        from: startOfMonth(selectedDate),
+        to: undefined,
+      });
+    } else if (range.from) {
+      const isFromBeforeTo = isBefore(selectedDate, new Date(range.from));
       if (isFromBeforeTo) {
-        setSelectedRange({ from: { year, month }, to: selectedRange.from })
+        setDateRange({
+          from: startOfMonth(selectedDate),
+          to: endOfMonth(new Date(range.from)),
+        });
       } else {
-        setSelectedRange({ ...selectedRange, to: { year, month } })
+        setDateRange({
+          from: range.from,
+          to: endOfMonth(selectedDate),
+        });
       }
     }
-  }
+  };
 
   const handlePreviousYear = () => {
-    setStartYear(startYear - 1)
-  }
+    setStartYear(startYear - 1);
+  };
 
   const handleNextYear = () => {
-    setStartYear(startYear + 1)
-  }
+    setStartYear(startYear + 1);
+  };
 
   const isMonthSelected = (year: number, month: number) => {
-    if (!selectedRange.from) return false
-    if (selectedRange.to) {
-      const startDate = new Date(selectedRange.from.year, selectedRange.from.month)
-      const endDate = new Date(selectedRange.to.year, selectedRange.to.month)
-      const currentDate = new Date(year, month)
-      return currentDate >= startDate && currentDate <= endDate
+    if (!range?.from) return false;
+    if (range.to) {
+      const startDate = new Date(range.from);
+      const endDate = new Date(range.to);
+      const currentDate = new Date(year, month);
+      return currentDate >= startDate && currentDate <= endDate;
     }
-    return selectedRange.from.year === year && selectedRange.from.month === month
-  }
+    return new Date(range.from).getFullYear() === year && new Date(range.from).getMonth() === month;
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -62,20 +60,16 @@ export function DateRangeMonthly({ className }: YearMonthRangePickerProps) {
           <Button
             id="year-month-range"
             variant={"secondary"}
-            className={cn(
-              "w-7/8 justify-start text-left font-normal",
-              !selectedRange.from && "text-muted-foreground"
-            )}
+            className={cn("w-7/8 justify-start text-left font-normal", !range?.from && "text-muted-foreground")}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedRange.from ? (
-              selectedRange.to ? (
+            {range?.from ? (
+              range.to ? (
                 <>
-                  {format(new Date(selectedRange.from.year, selectedRange.from.month), "MMM yyyy")} -{" "}
-                  {format(new Date(selectedRange.to.year, selectedRange.to.month), "MMM yyyy")}
+                  {format(new Date(range.from), "MMM yyyy")} - {format(new Date(range.to), "MMM yyyy")}
                 </>
               ) : (
-                format(new Date(selectedRange.from.year, selectedRange.from.month), "MMM yyyy")
+                format(new Date(range.from), "MMM yyyy")
               )
             ) : (
               <span>Select a month range</span>
@@ -126,5 +120,5 @@ export function DateRangeMonthly({ className }: YearMonthRangePickerProps) {
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

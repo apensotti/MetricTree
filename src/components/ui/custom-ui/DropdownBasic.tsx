@@ -29,7 +29,7 @@ export function Dropdown({optionsList, setOption, option}: DropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" className="w-5/6 justify-between">
+        <Button variant="secondary" className="w-5/6 justify-between mt-1">
         {option || "Select"}
         <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>        

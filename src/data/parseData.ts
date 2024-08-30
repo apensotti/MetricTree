@@ -49,38 +49,32 @@ export async function parseData(
         first_revenue: parseFloat(item.first_revenue),
         repeat_revenue: parseFloat(item.repeat_revenue)
     }));
-
-    // Calculate the midpoint date
-    const midpoint = new Date((range_from.getTime() + range_to.getTime()) / 2);
-
-    // Split the data into two ranges
-    const range1Data = data.filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate >= range_from && itemDate <= midpoint;
-    });
-
-    const range2Data = data.filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate > midpoint && itemDate <= range_to;
-    });
-
-    const range1_start_date = range1Data.length > 0 ? range1Data[0].date : range_from.toISOString().split('T')[0];
-    const range1_end_date = range1Data.length > 0 ? range1Data[range1Data.length - 1].date : midpoint.toISOString().split('T')[0];
-    const range2_start_date = range2Data.length > 0 ? range2Data[0].date : midpoint.toISOString().split('T')[0];
-    const range2_end_date = range2Data.length > 0 ? range2Data[range2Data.length - 1].date : range_to.toISOString().split('T')[0];
-
-    const dateFilter = (item: ParsedProps) => {
-        const itemDate = new Date(item.date);
-        return itemDate >= range_from && itemDate <= range_to;
-    };
+    
     const marketFilter = (item: ParsedProps) => market.includes(item.market);
     const channelFilter = (item: ParsedProps) => channel.includes(item.channel);
     const strategyFilter = (item: ParsedProps) => strategy.includes(item.strategy);
     const platformFilter = (item: ParsedProps) => platform.includes(item.platform);
     const channelTypeFilter = (item: ParsedProps) => channelType.includes(item.channel_type);
-
-    const filters = [dateFilter, marketFilter, channelFilter, strategyFilter, platformFilter, channelTypeFilter];
+    
+    const filters = [marketFilter, channelFilter, strategyFilter, platformFilter, channelTypeFilter];
     const filteredData = filters.reduce((data, filter) => data.filter(filter), data);
+    
+    const midpoint = new Date((range_from.getTime() + range_to.getTime()) / 2);
+
+    const range1Data = filteredData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= range_from && itemDate <= midpoint;
+    });
+
+    const range2Data = filteredData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate > midpoint && itemDate <= range_to;
+    });
+
+    const range1_end_date = range1Data.length > 0 ? range1Data[0].date : range_from.toISOString().split('T')[0];
+    const range1_start_date = range1Data.length > 0 ? range1Data[range1Data.length - 1].date : midpoint.toISOString().split('T')[0];
+    const range2_end_date = range2Data.length > 0 ? range2Data[0].date : midpoint.toISOString().split('T')[0];
+    const range2_start_date = range2Data.length > 0 ? range2Data[range2Data.length - 1].date : range_to.toISOString().split('T')[0];
 
     const totalRangeData = filteredData.filter(item => {
         const itemDate = new Date(item.date);
@@ -141,16 +135,16 @@ export async function parseData(
 
     const treeData: TreeDataProps = {
         year: new Date().getFullYear(),
-        range1_start_date,
-        range1_end_date,
+        range1_start_date: range1_start_date,
+        range1_end_date: range1_end_date,
         range1_first_appointment: range1Data.reduce((total, item) => total + item.first_appointment, 0),
         range1_repeat_appointment: range1Data.reduce((total, item) => total + item.repeat_appointment, 0),
         range1_first_revenue: range1Data.reduce((total, item) => total + item.first_revenue, 0),
         range1_repeat_revenue: range1Data.reduce((total, item) => total + item.repeat_revenue, 0),
         range1_total_revenue: range1Data.reduce((total, item) => total + item.first_revenue + item.repeat_revenue, 0),
         range1_total_appointments: range1Data.reduce((total, item) => total + item.first_appointment + item.repeat_appointment, 0),
-        range2_start_date,
-        range2_end_date,
+        range2_start_date:range2_start_date,
+        range2_end_date:range2_end_date,
         range2_first_appointment: range2Data.reduce((total, item) => total + item.first_appointment, 0),
         range2_repeat_appointment: range2Data.reduce((total, item) => total + item.repeat_appointment, 0),
         range2_first_revenue: range2Data.reduce((total, item) => total + item.first_revenue, 0),

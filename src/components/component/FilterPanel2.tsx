@@ -13,6 +13,9 @@ import { types } from '@/data/parseData'
 import { FilterPanelProps } from '@/data/props'
 import { DateRangeWeekly } from '../ui/custom-ui/DateRangeWeekly'
 import { DateRangeMonthly2 } from '../ui/custom-ui/DateRangeMonthly copy'
+import { DateRangeYearly } from '../ui/custom-ui/DateRangeYearly'
+import { Switch } from '../ui/switch'
+import { Badge } from '../ui/badge'
 
 const FilterPanel2 = ({
     setDateRange,
@@ -26,9 +29,10 @@ const FilterPanel2 = ({
     setPlatform, 
     platform, 
     setChannelType, 
-    channelType }: FilterPanelProps) => {
+    channelType, data }: FilterPanelProps) => {
 
     const [grain, setGrain] = React.useState<string>("Day")
+    const [isSwitchChecked, setIsSwitchChecked] = React.useState(false);
     const [filters, setFilters] = React.useState<string[]>([])
     const [dropdownOptions, setDropdownOptions] = React.useState<types>({
         market: [],
@@ -119,16 +123,22 @@ const FilterPanel2 = ({
     const renderGrainComponent = (grain: string) => {
         switch (grain) {
             case "Day":
-                return (
-                    <DateRangeDaily setDateRange={setDateRange} range={range}/>
+                return isSwitchChecked ? (
+                    <DateRangeDaily setDateRange={setDateRange} range={range} />
+                ) : (
+                    <DateRangeDaily setDateRange={setDateRange} range={range} />
                 );
             case "Month":
-                return (
-                    <DateRangeMonthly2/>
+                return isSwitchChecked ? (
+                    <DateRangeMonthly2 />
+                ) : (
+                    <DateRangeMonthly setDateRange={setDateRange} range={range}/>
                 );
             case "Year":
-                return (
-                    <DateRangeWeekly setDateRange={setDateRange} date={range}/>
+                return isSwitchChecked ? (
+                    <DateRangeYearly />
+                ) : (
+                    <DateRangeYearly />
                 );
             default:
                 return null;
@@ -141,25 +151,58 @@ const FilterPanel2 = ({
         { value: "Year", label: "Year" },
     ]
 
+    const formatDate = (dateString: string | Date) => {
+        if (!dateString) {
+            return "Invalid Date";
+        }
+    
+        const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    
+        if (isNaN(date.getTime())) {
+            return "Invalid Date";
+        }
+    
+        const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit' });
+        return formatter.format(date);
+    }
+
     return (
-        <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4'>
-            <div className="flex flex-col space-y-4">
-                <div>
-                    <h1 className="text-white pb-2 text-md font-semibold">Grain</h1>
-                    <Dropdown optionsList={grainOptions} setOption={setGrain} option={grain}></Dropdown>
+        <div className='flex justify-between gap-4'>
+            <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4'>
+                <div className='flex'>
+                    <div className='p-2 pt-0'>
+                        <h1 className='text-white text-xs pr-4 font-bold pl-1'>Range A:</h1>
+                        <Badge variant={'secondary'}>{formatDate(data.range1_start_date instanceof Date ? formatDate(data.range1_start_date.toISOString()) : formatDate(data.range1_start_date))} - {formatDate(data.range1_end_date instanceof Date ? formatDate(data.range1_end_date.toISOString()) : formatDate(data.range1_end_date))}</Badge>
+                    </div>
+                    <div className='p-2 pt-0'>
+                        <h1 className='text-white text-xs pr-4 font-bold pl-1'>Range B:</h1>
+                        <Badge variant={'secondary'}>{formatDate(data.range2_start_date instanceof Date ? formatDate(data.range2_start_date.toISOString()) : formatDate(data.range2_start_date))} - {formatDate(data.range2_end_date instanceof Date ? formatDate(data.range2_end_date.toISOString()) : formatDate(data.range2_end_date))}</Badge>
+                    </div>
                 </div>
-                {renderGrainComponent(grain)}
-                <div className='flex justify-between'>
-                  <h1 className="text-white pb-2 text-md font-semibold">Filters</h1>
-                  <DropdownMultiSelect setFilter={setFilters} filters={filters} />
-                </div>
-                <div className="flex flex-col space-y-2">
-                    {filters.map(filter => (
-                        <div key={filter}>
-                            <h1 className="text-white pb-2 text-sm font-semibold">{filter}</h1>
-                            {renderFilterComponent(filter)}
+                <div className="flex flex-col space-y-4">
+                    <div>
+                        <h1 className="text-white pb-2 text-md font-bold">Date</h1>
+                        <div className='flex justify-evenly gap-4'>
+                            <Dropdown optionsList={grainOptions} setOption={setGrain} option={grain}></Dropdown>
+                            <div className='flex-row'>
+                                <h1 className="text-white pb-1 text-xs font-normal">Compare</h1>
+                                <Switch checked={isSwitchChecked} onCheckedChange={setIsSwitchChecked}/>
+                            </div>
                         </div>
-                    ))}
+                    </div>
+                    {renderGrainComponent(grain)}
+                    <div className='flex justify-between'>
+                      <h1 className="text-white pb-2 text-md font-bold">Filters</h1>
+                      <DropdownMultiSelect setFilter={setFilters} filters={filters} />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                        {filters.map(filter => (
+                            <div key={filter}>
+                                <h1 className="text-white pb-2 text-sm font-normal">{filter}</h1>
+                                {renderFilterComponent(filter)}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

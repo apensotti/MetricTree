@@ -20,13 +20,14 @@ import '../../../tailwind.config'
 import DataNode from "../component/DataNode"
 import NodeArrow from "../component/NodeArrow"
 
-import { format, startOfWeek, endOfWeek, subDays } from "date-fns"
+import { format, startOfWeek, endOfWeek, subDays, set } from "date-fns"
 import { DateRange } from "react-day-picker"
 
 import {parseData, extractUniqueValues ,generateMetricTreeConnections, generateMetricTreeData } from "../../data/parseData";
 
 import FilterPanel2 from "../component/FilterPanel2";
 import OperatorArrow from "../component/OperatorArrow";
+import { TreeDataProps } from "@/data/props";
 
 
 
@@ -47,16 +48,19 @@ export default function Flow() {
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+
   const [range, setDateRange] = React.useState<DateRange | undefined>({
     from: initialDateRange.from,
     to: initialDateRange.to,
   })
-  //const [period, setPeriod] = React.useState<string>("Week")
+
   const [market, setMarket] = React.useState<string[]>([])
   const [channel, setChannel] = React.useState<string[]>([])
   const [strategy, setStrategy] = React.useState<string[]>([])
   const [platform, setPlatform] = React.useState<string[]>([])
   const [channelType, setChannelType] = React.useState<string[]>([])
+
+  const [data, setData] = useState<TreeDataProps>({} as TreeDataProps);
 
   const [initialized, setInitialized] = useState(false);
 
@@ -87,6 +91,7 @@ export default function Flow() {
         const edges = await generateMetricTreeConnections(data);
         setNodes(nodes);
         setEdges(edges);
+        setData(data);
       }
     }
 
@@ -115,7 +120,8 @@ export default function Flow() {
                       setPlatform={setPlatform}
                       platform={platform}
                       setChannelType={setChannelType}
-                      channelType={channelType}/>
+                      channelType={channelType}
+                      data={data}/>
       </Panel>
       <Background gap={60} size={1.5}/>
       <Controls className="bg-white"/>
