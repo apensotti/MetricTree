@@ -184,7 +184,7 @@ const FilterPanel2 = ({
                         <h1 className="text-white pb-2 text-md font-bold">Date</h1>
                         <div className='flex justify-evenly gap-4'>
                             <Dropdown optionsList={grainOptions} setOption={setGrain} option={grain}></Dropdown>
-                            <div className='flex-row'>
+                            <div className='flex-row text-center'>
                                 <h1 className="text-white pb-1 text-xs font-normal">Compare</h1>
                                 <Switch checked={isSwitchChecked} onCheckedChange={setIsSwitchChecked}/>
                             </div>
