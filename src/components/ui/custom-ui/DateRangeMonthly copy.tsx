@@ -1,57 +1,49 @@
-import React, { useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon } from "@radix-ui/react-icons";
-import { format, setMonth, isBefore, startOfMonth, endOfMonth } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarProps } from "@/data/props";
+"use client"
 
-export function DateRangeMonthly({ className, setDateRange, range }: CalendarProps) {
-  const [startYear, setStartYear] = useState(new Date().getFullYear());
+import React, { useState } from "react"
+import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon } from "@radix-ui/react-icons"
+import { format, setMonth } from "date-fns"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
-  const months = Array.from({ length: 12 }, (_, index) => format(setMonth(new Date(), index), "MMM"));
+interface YearMonthRangePickerProps {
+  className?: React.HTMLAttributes<HTMLDivElement>;
+}
+
+export function DateRangeMonthly2({ className }: YearMonthRangePickerProps) {
+  const [startYear, setStartYear] = useState(new Date().getFullYear())
+  const [selectedMonths, setSelectedMonths] = useState<{ first?: { year: number; month: number }, second?: { year: number; month: number } }>({})
+
+  const months = Array.from({ length: 12 }, (_, index) =>
+    format(setMonth(new Date(), index), "MMM")
+  )
 
   const handleMonthSelect = (year: number, month: number) => {
-    const selectedDate = new Date(year, month);
-    if (!range?.from || (range.from && range.to)) {
-      setDateRange({
-        from: startOfMonth(selectedDate),
-        to: undefined,
-      });
-    } else if (range.from) {
-      const isFromBeforeTo = isBefore(selectedDate, new Date(range.from));
-      if (isFromBeforeTo) {
-        setDateRange({
-          from: startOfMonth(selectedDate),
-          to: endOfMonth(new Date(range.from)),
-        });
-      } else {
-        setDateRange({
-          from: range.from,
-          to: endOfMonth(selectedDate),
-        });
-      }
+    if (!selectedMonths.first || (selectedMonths.first && selectedMonths.second)) {
+      setSelectedMonths({ first: { year, month }, second: undefined })
+    } else if (selectedMonths.first) {
+      setSelectedMonths({ ...selectedMonths, second: { year, month } })
     }
-  };
+  }
 
   const handlePreviousYear = () => {
-    setStartYear(startYear - 1);
-  };
+    setStartYear(startYear - 1)
+  }
 
   const handleNextYear = () => {
-    setStartYear(startYear + 1);
-  };
+    setStartYear(startYear + 1)
+  }
 
   const isMonthSelected = (year: number, month: number) => {
-    if (!range?.from) return false;
-    if (range.to) {
-      const startDate = new Date(range.from);
-      const endDate = new Date(range.to);
-      const currentDate = new Date(year, month);
-      return currentDate >= startDate && currentDate <= endDate;
-    }
-    return new Date(range.from).getFullYear() === year && new Date(range.from).getMonth() === month;
-  };
+    if (!selectedMonths.first) return false
+    return (selectedMonths.first.year === year && selectedMonths.first.month === month) ||
+      (selectedMonths.second && selectedMonths.second.year === year && selectedMonths.second.month === month)
+  }
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -60,19 +52,23 @@ export function DateRangeMonthly({ className, setDateRange, range }: CalendarPro
           <Button
             id="year-month-range"
             variant={"secondary"}
-            className={cn("w-7/8 justify-start text-left font-normal", !range?.from && "text-muted-foreground")}
+            className={cn(
+              "w-7/8 justify-start text-left font-normal",
+              !selectedMonths.first && "text-muted-foreground"
+            )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {range?.from ? (
-              range.to ? (
+            {selectedMonths.first ? (
+              selectedMonths.second ? (
                 <>
-                  {format(new Date(range.from), "MMM yyyy")} - {format(new Date(range.to), "MMM yyyy")}
+                  {format(new Date(selectedMonths.first.year, selectedMonths.first.month), "MMM yyyy")},{" "}
+                  {format(new Date(selectedMonths.second.year, selectedMonths.second.month), "MMM yyyy")}
                 </>
               ) : (
-                format(new Date(range.from), "MMM yyyy")
+                format(new Date(selectedMonths.first.year, selectedMonths.first.month), "MMM yyyy")
               )
             ) : (
-              <span>Select a month range</span>
+              <span>Select two months</span>
             )}
           </Button>
         </PopoverTrigger>
@@ -120,5 +116,5 @@ export function DateRangeMonthly({ className, setDateRange, range }: CalendarPro
         </PopoverContent>
       </Popover>
     </div>
-  );
+  )
 }

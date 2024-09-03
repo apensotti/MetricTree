@@ -55,18 +55,18 @@ const DataNode = ({id, data}: NodeProps<DataNode>) => {
     <div id={id} className="flex flex-col items-center bg-gray-950 text-white shadow-lg">
         <div className="border border-white rounded-md w-80">
           <p className="text-sm font-semibold pl-3 p-2">{data.title}</p>
-          <div className='border-t border-b border-white flex felx-col gap-6 justify-center'>
-            <div className="flex flex-col p-2">
-              <p className="text-sm font-semibold ">{data.valueStart}</p>
-              <p className="text-xs pt-1 text-gray-400">{data.start_date}</p>
+          <div className='border-t border-b border-white flex justify-center gap-8'>
+            <div className="flex-col justify-center mt-3 mb-3 m-2">
+              <p className="text-sm font-semibold">{data.valueStart}</p>
+              <p className="text-xs text-gray-400 text-center">{"Range A"}</p>
             </div>
-            <div className="flex flex-col p-2">
-              <p className="text-sm font-semibold ">{data.valueEnd}</p>
-              <p className="text-xs pt-1 text-gray-400">{data.end_date}</p>
+            <div className="flex-col justify-center mt-3 mb-3 m-2">
+              <p className="text-sm font-semibold">{data.valueEnd}</p>
+              <p className="text-xs text-gray-400 text-center">{"Range B"}</p>
             </div>
-            <div className="flex flex-col p-2">
+            <div className="flex-col justify-center mt-3 mb-3 m-2">
               <p className={`text-sm font-semibold ${getChangeClass(data.change)}`}>{data.change}</p>
-              <p className="text-xs pt-1 text-gray-400">Change</p>
+              <p className="text-xs text-center text-gray-400">Change</p>
             </div>
           </div>
           <div className="flex">

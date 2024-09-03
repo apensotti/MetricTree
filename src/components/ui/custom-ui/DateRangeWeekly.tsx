@@ -20,7 +20,7 @@ interface DateRangeSelectionProps {
   date: DateRange | undefined;
 }
 
-export function TwoWeekDateSelection({className, setDateRange, date}: DateRangeSelectionProps) {
+export function DateRangeWeekly({className, setDateRange, date}: DateRangeSelectionProps) {
 
   const handleSelect = (range: DateRange | undefined) => {
     if (range?.from && range?.to) {

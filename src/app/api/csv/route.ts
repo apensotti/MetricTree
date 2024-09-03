@@ -7,12 +7,23 @@ export async function GET() {
 
   try {
     const csvContent = fs.readFileSync(csvPath, 'utf8');
-    return new NextResponse(csvContent, {
+    
+    const response = new NextResponse(csvContent, {
       headers: {
-        'Content-Type': 'text/metric_tree',
+        'Content-Type': 'text/csv',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET', 
+        'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
+
+    return response;
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error: 'Failed to load CSV file' }), { status: 500 });
+    return new NextResponse(JSON.stringify({ error: 'Failed to load CSV file' }), {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   }
 }
