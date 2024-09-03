@@ -71,10 +71,12 @@ export async function parseData(
         return itemDate > midpoint && itemDate <= range_to;
     });
 
-    const range1_end_date = range1Data.length > 0 ? range1Data[0].date : range_from.toISOString().split('T')[0];
-    const range1_start_date = range1Data.length > 0 ? range1Data[range1Data.length - 1].date : midpoint.toISOString().split('T')[0];
-    const range2_end_date = range2Data.length > 0 ? range2Data[0].date : midpoint.toISOString().split('T')[0];
-    const range2_start_date = range2Data.length > 0 ? range2Data[range2Data.length - 1].date : range_to.toISOString().split('T')[0];
+    const range1_start_date = range_from;
+    const range1_end_date = midpoint.toISOString().split('T')[0];
+    const range2_start_date = midpoint.toISOString().split('T')[0];
+    const range2_end_date = range_to;
+
+    console.log(range1_end_date);
 
     const totalRangeData = filteredData.filter(item => {
         const itemDate = new Date(item.date);
