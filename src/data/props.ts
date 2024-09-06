@@ -89,7 +89,7 @@ export interface TreeDataProps {
 export interface DoubleDateRange {
   range1: {
     from: Date | undefined;
-    to: Date| undefined;
+    to: Date | undefined;
   };
   range2: {
     from: Date | undefined;
