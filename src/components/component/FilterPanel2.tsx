@@ -173,7 +173,7 @@ const FilterPanel2 = ({
     }
 
     return (
-        <Draggable handle=".drag-handle">
+        
             <div className='w-72 border border-gray-800 rounded-sm backdrop-blur-md bg-slate/30 p-4 relative'>
                 <div className='absolute top-2 right-2 drag-handle cursor-pointer'>
                     <DragHandleDots1Icon className='text-white'/>
@@ -214,7 +214,7 @@ const FilterPanel2 = ({
                     </div>
                 </div>
             </div>
-        </Draggable>
+        
     );
     
 }

@@ -127,7 +127,8 @@ export default function Flow() {
               maxZoom={5}
               minZoom={.1}
               className="bg-gray-950">
-      <Panel position="top-right">
+      <Draggable handle=".drag-handle">
+        <Panel position="top-right">
           <FilterPanel2 
             setDateRange={setDateRange} 
             setDateRanges={setDateRanges}
@@ -147,7 +148,8 @@ export default function Flow() {
             setIsSwitchChecked={setIsSwitchChecked}
             data={data}
           />
-    </Panel>
+      </Panel>
+    </Draggable>
       <Background gap={60} size={1.5}/>
       <Controls className="bg-gray-800"/>
     </ReactFlow>

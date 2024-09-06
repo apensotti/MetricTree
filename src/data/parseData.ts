@@ -70,7 +70,6 @@ export async function parseData(
 
 
     if (comapre) {
-        console.log(true)
         if(ranges.range1.from !== null && ranges.range1.to !== null && ranges.range2.from !== null && ranges.range2.to !== null) {
             range1Data = filteredData.filter(item => {
                 const itemDate = new Date(item.date);
@@ -82,7 +81,6 @@ export async function parseData(
             });
         }
     } else {
-        console.log(false)
         // Range 1 and Range 2 data
         range1Data = filteredData.filter(item => {
             const itemDate = new Date(item.date);
