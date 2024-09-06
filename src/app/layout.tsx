@@ -1,4 +1,5 @@
 import { Inter as FontSans } from "next/font/google"
+import Script from 'next/script'
 import "@/styles/global.css"
 
 import { cn } from "@/lib/utils"
@@ -22,7 +23,7 @@ export const metadata = {
     return (
       <html lang="en" >
         <head>
-          <script src="https://cdn.tailwindcss.com"></script>
+          <Script src="https://cdn.tailwindcss.com"></Script>
         </head>
         <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
           {children}

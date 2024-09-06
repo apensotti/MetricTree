@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
+import { DateRange } from "@/data/props";
 import { DoubleDateRange } from "@/data/props";
 
 export function DateRangeDailyCompare({
