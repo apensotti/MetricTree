@@ -99,6 +99,7 @@ export interface DoubleDateRange {
 
 import { DateRange } from "react-day-picker";
 
+export type { DateRange };
 // FilterPanel2.tsx
 
 export interface FilterPanelProps {
