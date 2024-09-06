@@ -149,7 +149,7 @@ export default function Flow() {
           />
     </Panel>
       <Background gap={60} size={1.5}/>
-      <Controls className="bg-white"/>
+      <Controls className="bg-gray-800"/>
     </ReactFlow>
     </>
   );
