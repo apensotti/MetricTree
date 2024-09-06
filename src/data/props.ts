@@ -97,10 +97,7 @@ export interface DoubleDateRange {
   };
 }
 
-export type DateRange = {
-  from: Date | undefined;
-  to: Date | undefined;
-};
+import { DateRange } from "react-day-picker";
 
 // FilterPanel2.tsx
 
