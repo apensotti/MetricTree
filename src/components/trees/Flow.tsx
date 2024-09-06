@@ -22,7 +22,7 @@ import DataNode from "../component/DataNode"
 import NodeArrow from "../component/NodeArrow"
 
 import { format, startOfWeek, endOfWeek, subDays, set } from "date-fns"
-import { DateRange } from "react-day-picker"
+import { DateRange } from "@/data/props";
 
 import {parseData, extractUniqueValues ,generateMetricTreeConnections, generateMetricTreeData } from "../../data/parseData";
 

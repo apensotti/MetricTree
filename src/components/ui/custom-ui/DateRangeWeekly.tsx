@@ -3,7 +3,7 @@
 import React from "react"
 import { CalendarIcon } from "@radix-ui/react-icons"
 import { format, startOfWeek, addWeeks, endOfWeek } from "date-fns"
-import { DateRange } from "react-day-picker"
+import { DateRange } from "@/data/props"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
