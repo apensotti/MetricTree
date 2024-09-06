@@ -86,11 +86,24 @@ export interface TreeDataProps {
 
 // UI
 
+export interface DoubleDateRange {
+  range1: {
+    from: Date | undefined;
+    to: Date| undefined;
+  };
+  range2: {
+    from: Date | undefined;
+    to: Date | undefined;
+  };
+}
+
 // FilterPanel2.tsx
 
 export interface FilterPanelProps {
     setDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
     range: DateRange | undefined;
+    setDateRanges: React.Dispatch<React.SetStateAction<DoubleDateRange>>;
+    ranges: DoubleDateRange;
     setMarket: React.Dispatch<React.SetStateAction<string[]>>;
     market: string[];
     setChannel: React.Dispatch<React.SetStateAction<string[]>>;
@@ -102,6 +115,8 @@ export interface FilterPanelProps {
     setChannelType: React.Dispatch<React.SetStateAction<string[]>>;
     channelType: string[];
     data: TreeDataProps;
+    isSwitchChecked: boolean;
+    setIsSwitchChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // DailyRangeSelection.tsx

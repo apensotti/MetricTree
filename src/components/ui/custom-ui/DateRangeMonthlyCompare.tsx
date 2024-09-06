@@ -1,49 +1,64 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon } from "@radix-ui/react-icons"
-import { format, setMonth } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import React, { useState, useEffect } from "react";
+import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon } from "@radix-ui/react-icons";
+import { format, setMonth, startOfMonth, endOfMonth } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DoubleDateRange } from "@/data/props";
 
 interface YearMonthRangePickerProps {
   className?: React.HTMLAttributes<HTMLDivElement>;
+  selectedRanges: DoubleDateRange;
+  setSelectedRanges: React.Dispatch<React.SetStateAction<DoubleDateRange>>;
 }
 
-export function DateRangeMonthly2({ className }: YearMonthRangePickerProps) {
-  const [startYear, setStartYear] = useState(new Date().getFullYear())
-  const [selectedMonths, setSelectedMonths] = useState<{ first?: { year: number; month: number }, second?: { year: number; month: number } }>({})
 
-  const months = Array.from({ length: 12 }, (_, index) =>
-    format(setMonth(new Date(), index), "MMM")
-  )
+
+export function DateRangeMonthly2({ className, selectedRanges, setSelectedRanges }: YearMonthRangePickerProps) {
+  const [startYear, setStartYear] = useState(new Date().getFullYear());
+
+  const months = Array.from({ length: 12 }, (_, index) => format(setMonth(new Date(), index), "MMM"));
 
   const handleMonthSelect = (year: number, month: number) => {
-    if (!selectedMonths.first || (selectedMonths.first && selectedMonths.second)) {
-      setSelectedMonths({ first: { year, month }, second: undefined })
-    } else if (selectedMonths.first) {
-      setSelectedMonths({ ...selectedMonths, second: { year, month } })
-    }
-  }
+    const selectedMonthStart = startOfMonth(new Date(year, month));
+    const selectedMonthEnd = endOfMonth(new Date(year, month));
 
+    // If range1 is not set or range2 is already set, reset and assign to range1
+    if (!selectedRanges.range1.from || (selectedRanges.range1.from && selectedRanges.range2.from)) {
+      setSelectedRanges({
+        range1: { from: selectedMonthStart, to: selectedMonthEnd },
+        range2: { from: undefined, to: undefined },
+      });
+    }
+    // If range1 is set and range2 is not set, assign to range2
+    else if (selectedRanges.range1.from && !selectedRanges.range2.from) {
+      setSelectedRanges((prevRanges) => ({
+        ...prevRanges,
+        range2: { from: selectedMonthStart, to: selectedMonthEnd },
+      }));
+    }
+  };
+  
   const handlePreviousYear = () => {
-    setStartYear(startYear - 1)
-  }
+    setStartYear(startYear - 1);
+  };
 
   const handleNextYear = () => {
-    setStartYear(startYear + 1)
-  }
+    setStartYear(startYear + 1);
+  };
 
   const isMonthSelected = (year: number, month: number) => {
-    if (!selectedMonths.first) return false
-    return (selectedMonths.first.year === year && selectedMonths.first.month === month) ||
-      (selectedMonths.second && selectedMonths.second.year === year && selectedMonths.second.month === month)
-  }
+    const selectedMonthStart = startOfMonth(new Date(year, month)).getTime();
+    if (selectedRanges.range1.from && selectedRanges.range1.from.getTime() === selectedMonthStart) {
+      return true;
+    }
+    if (selectedRanges.range2.from && selectedRanges.range2.from.getTime() === selectedMonthStart) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -54,18 +69,18 @@ export function DateRangeMonthly2({ className }: YearMonthRangePickerProps) {
             variant={"secondary"}
             className={cn(
               "w-7/8 justify-start text-left font-normal",
-              !selectedMonths.first && "text-muted-foreground"
+              !selectedRanges.range1.from && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedMonths.first ? (
-              selectedMonths.second ? (
+            {selectedRanges.range1.from ? (
+              selectedRanges.range2.from ? (
                 <>
-                  {format(new Date(selectedMonths.first.year, selectedMonths.first.month), "MMM yyyy")},{" "}
-                  {format(new Date(selectedMonths.second.year, selectedMonths.second.month), "MMM yyyy")}
+                  {format(selectedRanges.range1.from, "MMM yyyy")},{" "}
+                  {format(selectedRanges.range2.from, "MMM yyyy")}
                 </>
               ) : (
-                format(new Date(selectedMonths.first.year, selectedMonths.first.month), "MMM yyyy")
+                format(selectedRanges.range1.from, "MMM yyyy")
               )
             ) : (
               <span>Select two months</span>
@@ -116,5 +131,5 @@ export function DateRangeMonthly2({ className }: YearMonthRangePickerProps) {
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

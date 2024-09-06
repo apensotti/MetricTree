@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { format } from 'path';
 import { TreeDataProps, ParsedProps, RawDataProps } from './props';
+import { DoubleDateRange } from './props';
 
 function getAbbreviatedMonth(date: Date) {
     const monthAbbreviations = [
@@ -32,7 +33,9 @@ export async function parseData(
     channel: string[], 
     strategy: string[], 
     platform: string[], 
-    channelType: string[]
+    channelType: string[],
+    comapre: boolean,
+    ranges: DoubleDateRange
 ): Promise<TreeDataProps> {
 
     const source = await parseCSV();
@@ -50,39 +53,60 @@ export async function parseData(
         repeat_revenue: parseFloat(item.repeat_revenue)
     }));
     
+    // Data Filtering 
     const marketFilter = (item: ParsedProps) => market.includes(item.market);
     const channelFilter = (item: ParsedProps) => channel.includes(item.channel);
     const strategyFilter = (item: ParsedProps) => strategy.includes(item.strategy);
     const platformFilter = (item: ParsedProps) => platform.includes(item.platform);
     const channelTypeFilter = (item: ParsedProps) => channelType.includes(item.channel_type);
-    
     const filters = [marketFilter, channelFilter, strategyFilter, platformFilter, channelTypeFilter];
     const filteredData = filters.reduce((data, filter) => data.filter(filter), data);
     
+    // Find date range midpoint
+
     const midpoint = new Date((range_from.getTime() + range_to.getTime()) / 2);
+    let range1Data: ParsedProps[] = [];
+    let range2Data: ParsedProps[] = [];
 
-    const range1Data = filteredData.filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate >= range_from && itemDate <= midpoint;
-    });
 
-    const range2Data = filteredData.filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate > midpoint && itemDate <= range_to;
-    });
+    if (comapre) {
+        console.log(true)
+        if(ranges.range1.from !== null && ranges.range1.to !== null && ranges.range2.from !== null && ranges.range2.to !== null) {
+            range1Data = filteredData.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= ranges.range1.from! && itemDate <= ranges.range1.to!;
+            });
+            range2Data = filteredData.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate > ranges.range2.from! && itemDate <= ranges.range2.to!;
+            });
+        }
+    } else {
+        console.log(false)
+        // Range 1 and Range 2 data
+        range1Data = filteredData.filter(item => {
+            const itemDate = new Date(item.date);
+            return itemDate >= range_from && itemDate <= midpoint;
+        });
+        range2Data = filteredData.filter(item => {
+            const itemDate = new Date(item.date);
+            return itemDate > midpoint && itemDate <= range_to;
+        });
+    }
 
+    // Range 1 and Range 2 date ranges
     const range1_start_date = range_from;
     const range1_end_date = midpoint.toISOString().split('T')[0];
     const range2_start_date = midpoint.toISOString().split('T')[0];
     const range2_end_date = range_to;
-
-    console.log(range1_end_date);
-
+    
+    // Total range data
     const totalRangeData = filteredData.filter(item => {
         const itemDate = new Date(item.date);
         return itemDate >= range_from && itemDate <= range_to;
     });
 
+    // Graph data aggregation
     const aggregatedDailyData: ParsedProps[] = [];
     const dateMap: { [key: string]: ParsedProps } = {};
 
@@ -134,7 +158,7 @@ export async function parseData(
         return currentValue - range1Value;
     };
 
-
+    // Tree data generation
     const treeData: TreeDataProps = {
         year: new Date().getFullYear(),
         range1_start_date: range1_start_date,

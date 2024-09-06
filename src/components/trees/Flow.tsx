@@ -29,6 +29,7 @@ import {parseData, extractUniqueValues ,generateMetricTreeConnections, generateM
 import FilterPanel2 from "../component/FilterPanel2";
 import OperatorArrow from "../component/OperatorArrow";
 import { TreeDataProps } from "@/data/props";
+import { DoubleDateRange } from "@/data/props";
 
 const nodeTypes: NodeTypes = {
   data: DataNode,
@@ -41,8 +42,12 @@ const edgeTypes: EdgeTypes = {
 
 export default function Flow() {
   const initialDateRange = {
-    from: new Date("2024-08-02"),
-    to: new Date("2024-08-16"),
+    from: new Date("2024-08-01"),
+    to: new Date("2024-08-30"),
+  };
+  const initialDateRange2 = {
+    from: new Date("2024-07-01"),
+    to: new Date("2024-07-31"),
   };
 
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -53,6 +58,17 @@ export default function Flow() {
     to: initialDateRange.to,
   })
 
+  const [ranges, setDateRanges] = React.useState<DoubleDateRange>({
+    range1: {
+      from: initialDateRange.from,
+      to: initialDateRange.to,
+    },
+    range2: {
+      from: initialDateRange2.from,
+      to: initialDateRange2.to,
+    },
+  });
+  const [isSwitchChecked, setIsSwitchChecked] = React.useState(false);
   const [market, setMarket] = React.useState<string[]>([])
   const [channel, setChannel] = React.useState<string[]>([])
   const [strategy, setStrategy] = React.useState<string[]>([])
@@ -84,7 +100,9 @@ export default function Flow() {
           channel.length === 0 ? uniqueValues.channel.map((option) => option.value) : channel,
           strategy.length === 0 ? uniqueValues.strategy.map((option) => option.value) : strategy,
           platform.length === 0 ? uniqueValues.platform.map((option) => option.value) : platform,
-          channelType.length === 0 ? uniqueValues.channel_type.map((option) => option.value) : channelType
+          channelType.length === 0 ? uniqueValues.channel_type.map((option) => option.value) : channelType,
+          isSwitchChecked,
+          ranges
         );
 
         const nodes = await generateMetricTreeData(data);
@@ -97,7 +115,7 @@ export default function Flow() {
     }
 
     initializeFilters();
-  }, [range, initialized, market, channel, strategy, platform, channelType]);
+  }, [range, initialized, market, channel, strategy, platform, channelType, isSwitchChecked, ranges]);
 
   return (
     <>
@@ -112,6 +130,8 @@ export default function Flow() {
       <Panel position="top-right">
           <FilterPanel2 
             setDateRange={setDateRange} 
+            setDateRanges={setDateRanges}
+            ranges={ranges}
             range={range}
             setMarket={setMarket}
             market={market}
@@ -123,6 +143,8 @@ export default function Flow() {
             platform={platform}
             setChannelType={setChannelType}
             channelType={channelType}
+            isSwitchChecked={isSwitchChecked}
+            setIsSwitchChecked={setIsSwitchChecked}
             data={data}
           />
     </Panel>

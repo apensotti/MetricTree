@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react'
-
-import { DateRange } from 'react-day-picker'
+import { DoubleDateRange } from '@/data/props'
 import { CheckboxDropdown } from '../ui/custom-ui/DropdownCheckbox'
-import { DateRangeDaily } from '../ui/custom-ui/DateRangeDaily'
 import { Dropdown } from '../ui/custom-ui/DropdownBasic'
-import { DateRangeMonthly } from '../ui/custom-ui/DateRangeMonthly'
 import { DropdownMultiSelect } from '../ui/custom-ui/DropdownMultiSelect'
 
 import { DragHandleDots1Icon } from '@radix-ui/react-icons'
@@ -13,14 +10,19 @@ import { types } from '@/data/parseData'
 import Draggable from 'react-draggable'
 
 import { FilterPanelProps } from '@/data/props'
+import { DateRangeDaily } from '../ui/custom-ui/DateRangeDaily'
+import { DateRangeDailyCompare } from '../ui/custom-ui/DateRangeDailyCompare'
 import { DateRangeWeekly } from '../ui/custom-ui/DateRangeWeekly'
-import { DateRangeMonthly2 } from '../ui/custom-ui/DateRangeMonthly copy'
+import { DateRangeMonthly } from '../ui/custom-ui/DateRangeMonthly'
+import { DateRangeMonthly2 } from '../ui/custom-ui/DateRangeMonthlyCompare'
 import { DateRangeYearly } from '../ui/custom-ui/DateRangeYearly'
 import { Switch } from '../ui/switch'
 import { Badge } from '../ui/badge'
 
 const FilterPanel2 = ({
     setDateRange,
+    setDateRanges,
+    ranges,
     range,
     setMarket, 
     market, 
@@ -31,10 +33,12 @@ const FilterPanel2 = ({
     setPlatform, 
     platform, 
     setChannelType, 
-    channelType, data }: FilterPanelProps) => {
+    channelType, 
+    isSwitchChecked,
+    setIsSwitchChecked, 
+    data }: FilterPanelProps) => {
 
     const [grain, setGrain] = React.useState<string>("Day")
-    const [isSwitchChecked, setIsSwitchChecked] = React.useState(false);
     const [filters, setFilters] = React.useState<string[]>([])
     const [dropdownOptions, setDropdownOptions] = React.useState<types>({
         market: [],
@@ -126,13 +130,13 @@ const FilterPanel2 = ({
         switch (grain) {
             case "Day":
                 return isSwitchChecked ? (
-                    <DateRangeDaily setDateRange={setDateRange} range={range} />
+                    <DateRangeDailyCompare  setDateRanges={setDateRanges} ranges={ranges}/>
                 ) : (
                     <DateRangeDaily setDateRange={setDateRange} range={range} />
                 );
             case "Month":
                 return isSwitchChecked ? (
-                    <DateRangeMonthly2 />
+                    <DateRangeMonthly2 selectedRanges={ranges} setSelectedRanges={setDateRanges}/>
                 ) : (
                     <DateRangeMonthly setDateRange={setDateRange} range={range}/>
                 );
