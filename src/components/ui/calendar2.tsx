@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { DayPicker, DayPickerRangeProps, SelectRangeEventHandler, DoubleDateRange } from "react-day-picker";
+import { DayPicker, DayPickerRangeProps, SelectRangeEventHandler } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { DoubleDateRange } from "@/data/props";
 
 interface CustomCalendarProps extends DayPickerRangeProps {
   className?: string;

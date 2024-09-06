@@ -85,16 +85,11 @@ export interface TreeDataProps {
 }
 
 // UI
+import { DateRange } from "react-day-picker";
 
 export interface DoubleDateRange {
-  range1: {
-    from: Date | undefined;
-    to: Date| undefined;
-  };
-  range2: {
-    from: Date | undefined;
-    to: Date | undefined;
-  };
+  range1: DateRange
+  range2: DateRange
 }
 
 // FilterPanel2.tsx
@@ -120,8 +115,6 @@ export interface FilterPanelProps {
 }
 
 // DailyRangeSelection.tsx
-
-import { DateRange } from "react-day-picker"
 
 export interface CalendarProps {
     className?: React.HTMLAttributes<HTMLDivElement>
